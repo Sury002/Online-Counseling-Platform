@@ -72,6 +72,13 @@ export default function VideoCall() {
     };
   }, [appointmentId, navigate]);
 
+  useEffect(() => {
+  // Trigger browser permission prompt (safe fallback)
+  navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch((err) => {
+    console.warn("Mic/Cam permission denied or missing:", err.message);
+  });
+}, []);
+
   // Join Agora when appointment is ready
   useEffect(() => {
     if (!appointment || !user) return;
@@ -91,57 +98,66 @@ export default function VideoCall() {
       );
     }, 10000);
 
-    const joinChannel = async () => {
-      try {
-        const uid = String(user._id);
-        const { data } = await API.get(
-          `/agora/generate-token?channel=${appointmentId}&uid=${uid}`
-        );
-        const generatedToken = data.token;
-        setToken(generatedToken);
+   const joinChannel = async () => {
+  try {
+    const uid = String(user._id); // use string UID
+    const { data } = await API.get(
+      `/agora/generate-token?channel=${appointmentId}&uid=${uid}`
+    );
+    const generatedToken = data.token;
+    setToken(generatedToken);
 
-        await client.join(APP_ID, appointmentId, generatedToken, uid);
+    console.log("📡 Channel:", appointmentId);
+    console.log("🆔 UID:", uid);
+    console.log("🔑 Token:", generatedToken);
 
-        if (!isMounted) return;
+    await client.join(APP_ID, appointmentId, generatedToken, uid);
 
-        if (isCounselor) {
-          try {
-            const devices = await AgoraRTC.getDevices();
-            const hasMic = devices.some((d) => d.kind === "audioinput");
-            const hasCam = devices.some((d) => d.kind === "videoinput");
+    // Listen for remote users
+    client.on("user-published", async (remoteUser, mediaType) => {
+  console.log("👥 Remote user published:", remoteUser.uid);
+  await client.subscribe(remoteUser, mediaType);
 
-            if (!hasMic && !hasCam) {
-              throw new Error("No microphone or camera found");
-            }
+  if (mediaType === "video" && remoteUser.videoTrack) {
+    remoteUser.videoTrack.play(remoteVideoRef.current);
+  }
 
-            const [audioTrack, videoTrack] =
-              await AgoraRTC.createMicrophoneAndCameraTracks();
+  if (mediaType === "audio" && remoteUser.audioTrack) {
+    remoteUser.audioTrack.play();
+  }
 
-            localAudioTrackRef.current = audioTrack;
-            localVideoTrackRef.current = videoTrack;
+  // 👇 Always mark user as joined
+  setRemoteUserJoined(true);
+});
 
-            await client.publish([audioTrack, videoTrack]);
-            videoTrack.play(localVideoRef.current);
-          } catch (err) {
-            console.warn("🎙️ Mic/Cam not available or denied:", err.message);
-          }
-        }
+    client.on("user-unpublished", (remoteUser) => {
+      console.log("👤 Remote user unpublished:", remoteUser.uid);
+      setRemoteUserJoined(false);
+    });
 
-        client.on("user-published", async (remoteUser, mediaType) => {
-          await client.subscribe(remoteUser, mediaType);
-          if (mediaType === "video") {
-            remoteUser.videoTrack.play(remoteVideoRef.current);
-            setRemoteUserJoined(true);
-          }
-        });
+    // Only the counselor publishes media
+    if (isCounselor) {
+      const devices = await AgoraRTC.getDevices();
+      const hasMic = devices.some((d) => d.kind === "audioinput");
+      const hasCam = devices.some((d) => d.kind === "videoinput");
 
-        client.on("user-unpublished", () => {
-          setRemoteUserJoined(false);
-        });
-      } catch (err) {
-        console.error("❌ Agora join error:", err);
+      if (!hasMic || !hasCam) {
+        console.warn("⚠ No mic/cam detected");
+        return;
       }
-    };
+
+      const [micTrack, camTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
+      localAudioTrackRef.current = micTrack;
+      localVideoTrackRef.current = camTrack;
+
+      await client.publish([micTrack, camTrack]);
+      camTrack.play(localVideoRef.current);
+    }
+  } catch (err) {
+    console.error("❌ Agora join error:", err);
+  }
+};
+
 
     joinChannel();
 
