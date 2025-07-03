@@ -19,8 +19,8 @@ router.get('/generate-token', (req, res) => {
   const currentTime = Math.floor(Date.now() / 1000);
   const privilegeExpireTime = currentTime + expireTime;
 
-  const token = RtcTokenBuilder.buildTokenWithUid(
-    APP_ID, APP_CERT, channel, parseInt(uid), role, privilegeExpireTime
+  const token = RtcTokenBuilder.buildTokenWithAccount(
+    APP_ID, APP_CERT, channel, uid, role, privilegeExpireTime
   );
 
   console.log("✅ Token generated:", token);
