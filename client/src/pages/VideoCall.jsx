@@ -36,7 +36,7 @@ export default function VideoCall() {
   const timerRef = useRef(null);
 
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
- const [token, setToken] = useState(null);
+  const [token, setToken] = useState(null);
 
   // Format time for display
   const formatTime = (seconds) => {
@@ -87,15 +87,18 @@ export default function VideoCall() {
 
     const joinChannel = async () => {
       try {
+        const uid = String(user._id); // ✅ Force UID as string
         const { data } = await API.get(
-          `/agora/generate-token?channel=${appointmentId}&uid=${user._id}`
+          `/agora/generate-token?channel=${appointmentId}&uid=${uid}`
         );
         const generatedToken = data.token;
         setToken(generatedToken);
-       
-        console.log("🎯 Token received from backend:", generatedToken);
-        
-        await client.join(APP_ID, appointmentId, generatedToken, user._id);
+
+        console.log("📡 Channel:", appointmentId);
+        console.log("🆔 UID:", uid);
+        console.log("🔑 Token:", generatedToken);
+
+        await client.join(APP_ID, appointmentId, generatedToken, uid); // ✅ Use string UID
 
         if (isCounselor) {
           const [audioTrack, videoTrack] =
