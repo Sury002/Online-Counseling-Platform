@@ -38,34 +38,4 @@ router.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-// ✅ Route: Stripe Webhook (raw body must be used before express.json)
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-  } catch (err) {
-    console.error('❌ Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  // ✅ Update appointment payment status
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const appointmentId = session.metadata.appointmentId;
-
-    try {
-      await Appointment.findByIdAndUpdate(appointmentId, { isPaid: true });
-      console.log(`✅ Appointment ${appointmentId} marked as paid.`);
-    } catch (err) {
-      console.error('❌ Failed to update appointment as paid:', err.message);
-    }
-  }
-
-  res.status(200).send('Webhook received');
-});
-
 module.exports = router;
