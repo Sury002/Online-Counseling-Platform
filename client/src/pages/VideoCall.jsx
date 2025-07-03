@@ -11,7 +11,6 @@ import {
   UserIcon,
   ClockIcon,
   CalendarIcon,
-  EllipsisHorizontalIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 
@@ -38,7 +37,7 @@ export default function VideoCall() {
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const [token, setToken] = useState(null);
 
-  // Format time for display
+  // Format call duration
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -47,16 +46,20 @@ export default function VideoCall() {
       .padStart(2, "0")}`;
   };
 
+  // Fetch appointment
   useEffect(() => {
+    let isMounted = true;
+
     if (!appointmentId) return;
 
     API.get(`/appointments/${appointmentId}`)
       .then((res) => {
-        setAppointment(res.data);
-        // Start timer when appointment is loaded
-        timerRef.current = setInterval(() => {
-          setCallDuration((prev) => prev + 1);
-        }, 1000);
+        if (isMounted) {
+          setAppointment(res.data);
+          timerRef.current = setInterval(() => {
+            setCallDuration((prev) => prev + 1);
+          }, 1000);
+        }
       })
       .catch((err) => {
         console.error("❌ Failed to fetch appointment:", err);
@@ -64,20 +67,23 @@ export default function VideoCall() {
       });
 
     return () => {
+      isMounted = false;
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [appointmentId, navigate]);
 
+  // Join Agora when appointment is ready
   useEffect(() => {
     if (!appointment || !user) return;
+
+    let isMounted = true;
+    const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    rtcClientRef.current = client;
 
     const isCounselor =
       user._id.toString() === appointment.counselorId._id.toString();
 
-    const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-    rtcClientRef.current = client;
-
-    // Simulate connection quality changes
+    // Simulate connection quality
     const qualityInterval = setInterval(() => {
       const qualities = ["good", "average", "poor"];
       setConnectionQuality(
@@ -87,27 +93,29 @@ export default function VideoCall() {
 
     const joinChannel = async () => {
       try {
-        const uid = String(user._id); // ✅ Force UID as string
+        const uid = String(user._id);
         const { data } = await API.get(
           `/agora/generate-token?channel=${appointmentId}&uid=${uid}`
         );
         const generatedToken = data.token;
         setToken(generatedToken);
 
-        console.log("📡 Channel:", appointmentId);
-        console.log("🆔 UID:", uid);
-        console.log("🔑 Token:", generatedToken);
+        await client.join(APP_ID, appointmentId, generatedToken, uid);
 
-        await client.join(APP_ID, appointmentId, generatedToken, uid); // ✅ Use string UID
+        if (!isMounted) return;
 
         if (isCounselor) {
-          const [audioTrack, videoTrack] =
-            await AgoraRTC.createMicrophoneAndCameraTracks();
-          localAudioTrackRef.current = audioTrack;
-          localVideoTrackRef.current = videoTrack;
-
-          await client.publish([audioTrack, videoTrack]);
-          videoTrack.play(localVideoRef.current);
+          try {
+            const [audioTrack, videoTrack] =
+              await AgoraRTC.createMicrophoneAndCameraTracks();
+            if (!isMounted) return;
+            localAudioTrackRef.current = audioTrack;
+            localVideoTrackRef.current = videoTrack;
+            await client.publish([audioTrack, videoTrack]);
+            videoTrack.play(localVideoRef.current);
+          } catch (err) {
+            console.warn("🎙️ Mic/Cam error:", err.message);
+          }
         }
 
         client.on("user-published", async (remoteUser, mediaType) => {
@@ -129,16 +137,18 @@ export default function VideoCall() {
     joinChannel();
 
     return () => {
+      isMounted = false;
+      clearInterval(qualityInterval);
       const leaveCall = async () => {
         if (localAudioTrackRef.current) localAudioTrackRef.current.close();
         if (localVideoTrackRef.current) localVideoTrackRef.current.close();
         await client.leave();
       };
       leaveCall();
-      clearInterval(qualityInterval);
     };
-  }, [appointment, user]);
+  }, [appointment]);
 
+  // Toggle mic
   const toggleMic = () => {
     if (localAudioTrackRef.current) {
       const newState = !micEnabled;
@@ -147,6 +157,7 @@ export default function VideoCall() {
     }
   };
 
+  // Toggle cam
   const toggleCam = () => {
     if (localVideoTrackRef.current) {
       const newState = !camEnabled;
@@ -155,6 +166,7 @@ export default function VideoCall() {
     }
   };
 
+  // Leave call
   const leaveCall = async () => {
     if (rtcClientRef.current) {
       await rtcClientRef.current.leave();
@@ -181,7 +193,7 @@ export default function VideoCall() {
       ? appointment.counselorId
       : appointment.clientId;
 
-  return (
+      return (
     <div className="h-screen w-full bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex justify-between items-center border-b border-gray-700/50 z-10">
