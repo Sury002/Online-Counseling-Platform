@@ -1,0 +1,3 @@
+.input {
+  @apply border p-2 rounded outline-none;
+}
