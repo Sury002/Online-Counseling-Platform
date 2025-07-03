@@ -37,6 +37,8 @@ export default function VideoCall() {
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const [token, setToken] = useState(null);
 
+  const [remoteUserConnected, setRemoteUserConnected] = useState(false);
+
   // Format call duration
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -113,8 +115,14 @@ export default function VideoCall() {
 
     await client.join(APP_ID, appointmentId, generatedToken, uid);
 
-    // Listen for remote users
-    client.on("user-published", async (remoteUser, mediaType) => {
+    // Fires when a remote user joins the channel (even without publishing media)
+client.on("user-joined", (remoteUser) => {
+  console.log("✅ Remote user joined channel:", remoteUser.uid);
+  setRemoteUserConnected(true); // user joined the channel
+});
+
+// Fires when remote user publishes audio/video
+client.on("user-published", async (remoteUser, mediaType) => {
   console.log("👥 Remote user published:", remoteUser.uid);
   await client.subscribe(remoteUser, mediaType);
 
@@ -125,9 +133,12 @@ export default function VideoCall() {
   if (mediaType === "audio" && remoteUser.audioTrack) {
     remoteUser.audioTrack.play();
   }
+});
 
-  // 👇 Always mark user as joined
-  setRemoteUserJoined(true);
+// Optional: user left
+client.on("user-left", (remoteUser) => {
+  console.log("❌ Remote user left:", remoteUser.uid);
+  setRemoteUserConnected(false);
 });
 
     client.on("user-unpublished", (remoteUser) => {
@@ -317,7 +328,7 @@ export default function VideoCall() {
             remoteUserJoined ? "opacity-100" : "opacity-90"
           }`}
         >
-          {!remoteUserJoined && (
+          {!remoteUserConnected && (
             <div className="h-full flex flex-col items-center justify-center text-center p-6">
               <div className="relative mb-6">
                 <div className="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center">
