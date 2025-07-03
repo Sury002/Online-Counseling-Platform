@@ -35,7 +35,7 @@ export default function VideoCall() {
   const localVideoTrackRef = useRef(null);
   const timerRef = useRef(null);
 
-  const APP_ID = "YOUR_AGORA_APP_ID";
+  const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const TOKEN = null;
 
   // Format time for display
@@ -71,7 +71,7 @@ export default function VideoCall() {
   useEffect(() => {
     if (!appointment || !user) return;
 
-     const isCounselor = user._id === appointment.counselorId._id;   
+     const isCounselor = user._id.toString() === appointment.counselorId._id.toString();
 
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     rtcClientRef.current = client;
