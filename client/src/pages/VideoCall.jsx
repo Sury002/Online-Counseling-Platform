@@ -36,7 +36,7 @@ export default function VideoCall() {
   const timerRef = useRef(null);
 
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
-  const TOKEN = null;
+ const [token, setToken] = useState(null);
 
   // Format time for display
   const formatTime = (seconds) => {
@@ -71,7 +71,8 @@ export default function VideoCall() {
   useEffect(() => {
     if (!appointment || !user) return;
 
-     const isCounselor = user._id.toString() === appointment.counselorId._id.toString();
+    const isCounselor =
+      user._id.toString() === appointment.counselorId._id.toString();
 
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     rtcClientRef.current = client;
@@ -84,10 +85,15 @@ export default function VideoCall() {
       );
     }, 10000);
 
-  
     const joinChannel = async () => {
       try {
-        await client.join(APP_ID, appointmentId, TOKEN, user._id);
+        const { data } = await API.get(
+          `/agora/generate-token?channel=${appointmentId}&uid=${user._id}`
+        );
+        const generatedToken = data.token;
+        setToken(generatedToken);
+
+        await client.join(APP_ID, appointmentId, generatedToken, user._id);
 
         if (isCounselor) {
           const [audioTrack, videoTrack] =
@@ -109,13 +115,6 @@ export default function VideoCall() {
 
         client.on("user-unpublished", () => {
           setRemoteUserJoined(false);
-        });
-
-        client.on("network-quality", (stats) => {
-          const { downlinkNetworkQuality } = stats;
-          if (downlinkNetworkQuality === 1) setConnectionQuality("good");
-          else if (downlinkNetworkQuality <= 3) setConnectionQuality("average");
-          else setConnectionQuality("poor");
         });
       } catch (err) {
         console.error("❌ Agora join error:", err);
