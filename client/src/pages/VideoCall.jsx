@@ -12,6 +12,10 @@ import {
   ClockIcon,
   CalendarIcon,
   Cog6ToothIcon,
+  SignalIcon,
+  SignalSlashIcon,
+  CheckCircleIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 
 export default function VideoCall() {
@@ -20,12 +24,13 @@ export default function VideoCall() {
   const navigate = useNavigate();
 
   const [appointment, setAppointment] = useState(null);
-  const [remoteUserJoined, setRemoteUserJoined] = useState(false);
   const [micEnabled, setMicEnabled] = useState(true);
   const [camEnabled, setCamEnabled] = useState(true);
   const [callDuration, setCallDuration] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [connectionQuality, setConnectionQuality] = useState("good");
+  const [networkStats, setNetworkStats] = useState(null);
+  const [callStatus, setCallStatus] = useState("connecting");
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -33,11 +38,22 @@ export default function VideoCall() {
   const localAudioTrackRef = useRef(null);
   const localVideoTrackRef = useRef(null);
   const timerRef = useRef(null);
+  const remoteUserRef = useRef(null);
+  const statsIntervalRef = useRef(null);
 
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const [token, setToken] = useState(null);
 
-  const [remoteUserConnected, setRemoteUserConnected] = useState(false);
+  // Participant states
+  const [remoteUserState, setRemoteUserState] = useState({
+    joined: false,
+    videoPublished: false,
+    audioPublished: false,
+    videoMuted: false,
+    audioMuted: false,
+    uid: null,
+    left: false
+  });
 
   // Format call duration
   const formatTime = (seconds) => {
@@ -58,6 +74,7 @@ export default function VideoCall() {
       .then((res) => {
         if (isMounted) {
           setAppointment(res.data);
+          setCallStatus("waiting");
           timerRef.current = setInterval(() => {
             setCallDuration((prev) => prev + 1);
           }, 1000);
@@ -75,11 +92,15 @@ export default function VideoCall() {
   }, [appointmentId, navigate]);
 
   useEffect(() => {
-  // Trigger browser permission prompt (safe fallback)
-  navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch((err) => {
-    console.warn("Mic/Cam permission denied or missing:", err.message);
-  });
-}, []);
+    // Trigger browser permission prompt (safe fallback)
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+      .then(stream => {
+        stream.getTracks().forEach(track => track.stop());
+      })
+      .catch((err) => {
+        console.warn("Mic/Cam permission denied or missing:", err.message);
+      });
+  }, []);
 
   // Join Agora when appointment is ready
   useEffect(() => {
@@ -89,8 +110,7 @@ export default function VideoCall() {
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     rtcClientRef.current = client;
 
-    const isCounselor =
-      user._id.toString() === appointment.counselorId._id.toString();
+    const isCounselor = user._id.toString() === appointment.counselorId._id.toString();
 
     // Simulate connection quality
     const qualityInterval = setInterval(() => {
@@ -100,81 +120,132 @@ export default function VideoCall() {
       );
     }, 10000);
 
-   const joinChannel = async () => {
-  try {
-    const uid = String(user._id); // use string UID
-    const { data } = await API.get(
-      `/agora/generate-token?channel=${appointmentId}&uid=${uid}`
-    );
-    const generatedToken = data.token;
-    setToken(generatedToken);
-
-    console.log("📡 Channel:", appointmentId);
-    console.log("🆔 UID:", uid);
-    console.log("🔑 Token:", generatedToken);
-
-    await client.join(APP_ID, appointmentId, generatedToken, uid);
-
-    // Fires when a remote user joins the channel (even without publishing media)
-client.on("user-joined", (remoteUser) => {
-  console.log("✅ Remote user joined channel:", remoteUser.uid);
-  setRemoteUserConnected(true); // user joined the channel
-});
-
-// Fires when remote user publishes audio/video
-client.on("user-published", async (remoteUser, mediaType) => {
-  console.log("👥 Remote user published:", remoteUser.uid);
-  await client.subscribe(remoteUser, mediaType);
-
-  if (mediaType === "video" && remoteUser.videoTrack) {
-    remoteUser.videoTrack.play(remoteVideoRef.current);
-  }
-
-  if (mediaType === "audio" && remoteUser.audioTrack) {
-    remoteUser.audioTrack.play();
-  }
-});
-
-// Optional: user left
-client.on("user-left", (remoteUser) => {
-  console.log("❌ Remote user left:", remoteUser.uid);
-  setRemoteUserConnected(false);
-});
-
-    client.on("user-unpublished", (remoteUser) => {
-      console.log("👤 Remote user unpublished:", remoteUser.uid);
-      setRemoteUserJoined(false);
-    });
-
-    // Only the counselor publishes media
-    if (isCounselor) {
-      const devices = await AgoraRTC.getDevices();
-      const hasMic = devices.some((d) => d.kind === "audioinput");
-      const hasCam = devices.some((d) => d.kind === "videoinput");
-
-      if (!hasMic || !hasCam) {
-        console.warn("⚠ No mic/cam detected");
-        return;
+    // Network stats monitoring
+    const monitorNetworkStats = async () => {
+      if (!client) return;
+      try {
+        const stats = await client.getRTCStats();
+        setNetworkStats({
+          uplink: stats.TxBitrate ? `${Math.round(stats.TxBitrate / 1024)} Mbps` : 'N/A',
+          downlink: stats.RxBitrate ? `${Math.round(stats.RxBitrate / 1024)} Mbps` : 'N/A',
+          packetLoss: stats.RxPacketLossRate ? `${Math.round(stats.RxPacketLossRate * 100)}%` : '0%'
+        });
+      } catch (err) {
+        console.error("Failed to get network stats:", err);
       }
+    };
 
-      const [micTrack, camTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
-      localAudioTrackRef.current = micTrack;
-      localVideoTrackRef.current = camTrack;
+    const joinChannel = async () => {
+      try {
+        const uid = String(user._id);
+        const { data } = await API.get(
+          `/agora/generate-token?channel=${appointmentId}&uid=${uid}`
+        );
+        const generatedToken = data.token;
+        setToken(generatedToken);
 
-      await client.publish([micTrack, camTrack]);
-      camTrack.play(localVideoRef.current);
-    }
-  } catch (err) {
-    console.error("❌ Agora join error:", err);
-  }
-};
+        console.log("📡 Channel:", appointmentId);
+        console.log("🆔 UID:", uid);
+        console.log("🔑 Token:", generatedToken);
 
+        await client.join(APP_ID, appointmentId, generatedToken, uid);
+        setCallStatus("connected");
+
+        // Start monitoring network stats
+        statsIntervalRef.current = setInterval(monitorNetworkStats, 5000);
+
+        client.on("user-joined", (remoteUser) => {
+          console.log("✅ Remote user joined channel:", remoteUser.uid);
+          remoteUserRef.current = remoteUser;
+          setRemoteUserState(prev => ({
+            ...prev,
+            joined: true,
+            uid: remoteUser.uid,
+            left: false
+          }));
+        });
+
+        client.on("user-published", async (remoteUser, mediaType) => {
+          console.log("👥 Remote user published:", remoteUser.uid, mediaType);
+          await client.subscribe(remoteUser, mediaType);
+
+          if (mediaType === "video") {
+            remoteUser.videoTrack.play(remoteVideoRef.current);
+            setRemoteUserState(prev => ({
+              ...prev,
+              videoPublished: true,
+              videoMuted: false
+            }));
+          }
+
+          if (mediaType === "audio") {
+            remoteUser.audioTrack.play();
+            setRemoteUserState(prev => ({
+              ...prev,
+              audioPublished: true,
+              audioMuted: false
+            }));
+          }
+        });
+
+        client.on("user-unpublished", (remoteUser, mediaType) => {
+          console.log("👤 Remote user unpublished:", remoteUser.uid, mediaType);
+          if (mediaType === "video") {
+            setRemoteUserState(prev => ({
+              ...prev,
+              videoPublished: false,
+              videoMuted: true
+            }));
+          }
+          if (mediaType === "audio") {
+            setRemoteUserState(prev => ({
+              ...prev,
+              audioPublished: false,
+              audioMuted: true
+            }));
+          }
+        });
+
+        client.on("user-left", (remoteUser) => {
+          console.log("❌ Remote user left:", remoteUser.uid);
+          setRemoteUserState(prev => ({
+            ...prev,
+            joined: false,
+            left: true,
+            uid: remoteUser.uid
+          }));
+        });
+
+        // Only the counselor publishes media
+        if (isCounselor) {
+          const devices = await AgoraRTC.getDevices();
+          const hasMic = devices.some((d) => d.kind === "audioinput");
+          const hasCam = devices.some((d) => d.kind === "videoinput");
+
+          if (!hasMic || !hasCam) {
+            console.warn("⚠ No mic/cam detected");
+            return;
+          }
+
+          const [micTrack, camTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
+          localAudioTrackRef.current = micTrack;
+          localVideoTrackRef.current = camTrack;
+
+          await client.publish([micTrack, camTrack]);
+          camTrack.play(localVideoRef.current);
+        }
+      } catch (err) {
+        console.error("❌ Agora join error:", err);
+        setCallStatus("failed");
+      }
+    };
 
     joinChannel();
 
     return () => {
       isMounted = false;
       clearInterval(qualityInterval);
+      if (statsIntervalRef.current) clearInterval(statsIntervalRef.current);
       const leaveCall = async () => {
         if (localAudioTrackRef.current) localAudioTrackRef.current.close();
         if (localVideoTrackRef.current) localVideoTrackRef.current.close();
@@ -204,10 +275,17 @@ client.on("user-left", (remoteUser) => {
 
   // Leave call
   const leaveCall = async () => {
-    if (rtcClientRef.current) {
-      await rtcClientRef.current.leave();
+    try {
+      if (rtcClientRef.current) {
+        await rtcClientRef.current.leave();
+      }
+      // Update appointment status to completed
+      await API.patch(`/appointments/${appointmentId}/complete`);
+    } catch (err) {
+      console.error("Error completing appointment:", err);
+    } finally {
+      navigate("/dashboard");
     }
-    navigate("/dashboard");
   };
 
   if (!appointment) {
@@ -229,13 +307,89 @@ client.on("user-left", (remoteUser) => {
       ? appointment.counselorId
       : appointment.clientId;
 
+  const renderRemoteUserStatus = () => {
+    if (remoteUserState.left) {
+      return (
+        <div className="h-full flex flex-col items-center justify-center text-center p-6">
+          <div className="relative mb-6">
+            <div className="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center">
+              <UserIcon className="h-16 w-16 text-gray-400" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 bg-red-600 rounded-full p-2">
+              <XCircleIcon className="h-5 w-5 text-white" />
+            </div>
+          </div>
+          <h3 className="text-xl font-medium text-gray-200">
+            {otherParticipant.name} has left the call
+          </h3>
+          <p className="text-gray-400 mt-2 max-w-md">
+            The other participant has ended the call. You can safely leave now.
+          </p>
+        </div>
+      );
+    }
+
+    if (!remoteUserState.joined) {
+      return (
+        <div className="h-full flex flex-col items-center justify-center text-center p-6">
+          <div className="relative mb-6">
+            <div className="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center">
+              <UserIcon className="h-16 w-16 text-gray-400" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-2 animate-pulse">
+              <ClockIcon className="h-5 w-5 text-white" />
+            </div>
+          </div>
+          <h3 className="text-xl font-medium text-gray-200">
+            Waiting for {otherParticipant.name}
+          </h3>
+          <p className="text-gray-400 mt-2 max-w-md">
+            {otherParticipant.name} hasn't joined yet. The call will start
+            automatically when they arrive.
+          </p>
+        </div>
+      );
+    }
+
+    if (remoteUserState.joined && !remoteUserState.videoPublished) {
+      return (
+        <div className="absolute inset-0 bg-gray-900/90 flex items-center justify-center">
+          <div className="text-center p-4">
+            <div className="inline-block bg-gray-800 p-4 rounded-full mb-3">
+              <VideoCameraSlashIcon className="h-10 w-10 text-gray-500" />
+            </div>
+            <p className="text-gray-300">
+              {otherParticipant.name}'s camera is off
+            </p>
+            {remoteUserState.audioPublished && (
+              <p className="text-sm text-gray-400 mt-1">
+                Audio is available
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex justify-between items-center border-b border-gray-700/50 z-10">
         <div className="flex items-center space-x-4">
-          <div className="bg-blue-600 p-2 rounded-lg shadow-lg">
-            <VideoCameraIcon className="h-6 w-6" />
+          <div className={`p-2 rounded-lg shadow-lg ${
+            callStatus === "connected" ? "bg-green-600" : 
+            callStatus === "failed" ? "bg-red-600" : "bg-blue-600"
+          }`}>
+            {callStatus === "connected" ? (
+              <CheckCircleIcon className="h-6 w-6" />
+            ) : callStatus === "failed" ? (
+              <XCircleIcon className="h-6 w-6" />
+            ) : (
+              <VideoCameraIcon className="h-6 w-6" />
+            )}
           </div>
           <div>
             <h2 className="text-xl font-semibold flex items-center">
@@ -265,6 +419,14 @@ client.on("user-left", (remoteUser) => {
           </div>
         </div>
         <div className="flex items-center space-x-3">
+          {networkStats && (
+            <div className="hidden md:flex items-center space-x-2 text-xs bg-gray-700/80 px-3 py-1.5 rounded-full">
+              <SignalIcon className="h-3 w-3 text-green-400" />
+              <span>↑ {networkStats.uplink}</span>
+              <span>↓ {networkStats.downlink}</span>
+              <span>Loss: {networkStats.packetLoss}</span>
+            </div>
+          )}
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 rounded-full hover:bg-gray-700 transition-colors"
@@ -325,55 +487,24 @@ client.on("user-left", (remoteUser) => {
         <div
           ref={remoteVideoRef}
           className={`absolute inset-0 bg-gray-800 transition-opacity duration-300 ${
-            remoteUserJoined ? "opacity-100" : "opacity-90"
+            remoteUserState.joined && remoteUserState.videoPublished ? "opacity-100" : "opacity-90"
           }`}
         >
-          {!remoteUserConnected && (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6">
-              <div className="relative mb-6">
-                <div className="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center">
-                  <UserIcon className="h-16 w-16 text-gray-400" />
-                </div>
-                <div className="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-2 animate-pulse">
-                  <ClockIcon className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <h3 className="text-xl font-medium text-gray-200">
-                Waiting for {otherParticipant.name}
-              </h3>
-              <p className="text-gray-400 mt-2 max-w-md">
-                {otherParticipant.name} hasn't joined yet. The call will start
-                automatically when they arrive.
-              </p>
-              <div className="mt-6 flex space-x-4">
-                <div className="flex items-center text-sm text-gray-400">
-                  <div className="w-3 h-3 rounded-full bg-blue-500 mr-2 animate-pulse"></div>
-                  <span>Calling...</span>
-                </div>
-                <div className="text-sm text-gray-400">
-                  <span>Duration: {formatTime(callDuration)}</span>
-                </div>
-              </div>
-            </div>
-          )}
-          {remoteUserJoined && !camEnabled && (
-            <div className="absolute inset-0 bg-gray-900/90 flex items-center justify-center">
-              <div className="text-center p-4">
-                <div className="inline-block bg-gray-800 p-4 rounded-full mb-3">
-                  <VideoCameraSlashIcon className="h-10 w-10 text-gray-500" />
-                </div>
-                <p className="text-gray-300">
-                  {otherParticipant.name}'s camera is off
-                </p>
-              </div>
-            </div>
-          )}
-          <span className="absolute top-4 left-4 text-sm bg-gray-900/80 px-3 py-1.5 rounded-full text-white flex items-center shadow">
-            <UserIcon className="h-3 w-3 mr-1" />
-            <span>
-              {remoteUserJoined ? otherParticipant.name : "Waiting..."}
+          {renderRemoteUserStatus()}
+          
+          {/* Status overlay */}
+          <div className="absolute top-4 left-4 flex items-center space-x-2">
+            <span className="text-sm bg-gray-900/80 px-3 py-1.5 rounded-full text-white flex items-center shadow">
+              <UserIcon className="h-3 w-3 mr-1" />
+              <span>{otherParticipant.name}</span>
             </span>
-          </span>
+            {remoteUserState.audioMuted && (
+              <span className="text-sm bg-gray-900/80 px-3 py-1.5 rounded-full text-white flex items-center shadow">
+                <NoSymbolIcon className="h-3 w-3 mr-1" />
+                <span>Muted</span>
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Local video (pip) */}
@@ -392,6 +523,9 @@ client.on("user-left", (remoteUser) => {
           <span className="absolute top-2 left-2 text-xs bg-gray-900/80 px-2 py-1 rounded-full text-white flex items-center">
             <UserIcon className="h-2.5 w-2.5 mr-1" />
             <span>You</span>
+            {!micEnabled && (
+              <NoSymbolIcon className="h-2.5 w-2.5 ml-1" />
+            )}
           </span>
         </div>
       </div>
