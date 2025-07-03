@@ -106,15 +106,24 @@ export default function VideoCall() {
 
         if (isCounselor) {
           try {
+            const devices = await AgoraRTC.getDevices();
+            const hasMic = devices.some((d) => d.kind === "audioinput");
+            const hasCam = devices.some((d) => d.kind === "videoinput");
+
+            if (!hasMic && !hasCam) {
+              throw new Error("No microphone or camera found");
+            }
+
             const [audioTrack, videoTrack] =
               await AgoraRTC.createMicrophoneAndCameraTracks();
-            if (!isMounted) return;
+
             localAudioTrackRef.current = audioTrack;
             localVideoTrackRef.current = videoTrack;
+
             await client.publish([audioTrack, videoTrack]);
             videoTrack.play(localVideoRef.current);
           } catch (err) {
-            console.warn("🎙️ Mic/Cam error:", err.message);
+            console.warn("🎙️ Mic/Cam not available or denied:", err.message);
           }
         }
 
@@ -193,7 +202,7 @@ export default function VideoCall() {
       ? appointment.counselorId
       : appointment.clientId;
 
-      return (
+  return (
     <div className="h-screen w-full bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex justify-between items-center border-b border-gray-700/50 z-10">
