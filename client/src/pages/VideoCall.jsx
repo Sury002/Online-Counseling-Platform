@@ -92,7 +92,9 @@ export default function VideoCall() {
         );
         const generatedToken = data.token;
         setToken(generatedToken);
-
+       
+        console.log("🎯 Token received from backend:", generatedToken);
+        
         await client.join(APP_ID, appointmentId, generatedToken, user._id);
 
         if (isCounselor) {

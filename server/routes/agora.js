@@ -13,6 +13,7 @@ router.get('/generate-token', (req, res) => {
 
   if (!channel || !uid) return res.status(400).json({ msg: 'Channel and UID required' });
 
+
   const role = RtcRole.PUBLISHER;
   const expireTime = 3600;
   const currentTime = Math.floor(Date.now() / 1000);
@@ -22,6 +23,11 @@ router.get('/generate-token', (req, res) => {
     APP_ID, APP_CERT, channel, parseInt(uid), role, privilegeExpireTime
   );
 
+  console.log("✅ Token generated:", token);
+  console.log("Channel:", channel);
+console.log("UID:", uid);
+console.log("AppID:", APP_ID);
+console.log("AppCert:", APP_CERT);
   res.json({ token });
 });
 
