@@ -7,6 +7,7 @@ const socketIo = require('socket.io');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Appointment = require('./models/Appointment');
 const socketHandler = require('./socket'); // ✅ New import
+const emailRoutes = require('./routes/email');
 
 const app = express();
 const server = http.createServer(app);
@@ -62,6 +63,7 @@ app.use('/api/agora', require('./routes/agora'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/users', require('./routes/user'));
+app.use('/api', emailRoutes);
 
 
 // ✅ Socket handling moved to its own file
