@@ -1,30 +1,30 @@
-import { useEffect, useState, useRef } from 'react';
-import { API } from '../api';
-import socket from '../socket';
-import { format } from 'date-fns';
-import { 
-  MessageSquare, 
-  Lock, 
-  Send, 
-  Mail, 
+import { useEffect, useState, useRef } from "react";
+import { API } from "../api";
+import socket from "../socket";
+import { format } from "date-fns";
+import {
+  MessageSquare,
+  Lock,
+  Send,
+  Mail,
   CreditCard,
   User as UserIcon,
   Clock,
   Check,
   CheckCheck,
   Shield,
-  BadgeCheck
-} from 'lucide-react';
+  BadgeCheck,
+} from "lucide-react";
 
 export default function ChatInterface() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const senderId = user?._id;
 
   const [appointments, setAppointments] = useState([]);
   const [selected, setSelected] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [text, setText] = useState('');
-  const [emailBody, setEmailBody] = useState('');
+  const [text, setText] = useState("");
+  const [emailBody, setEmailBody] = useState("");
   const [typingUser, setTypingUser] = useState(null);
   const [readMessages, setReadMessages] = useState({});
   const bottomRef = useRef();
@@ -32,32 +32,32 @@ export default function ChatInterface() {
   useEffect(() => {
     if (!senderId) return;
     API.get(`/appointments/my/${senderId}`)
-      .then(res => setAppointments(res.data))
-      .catch(err => console.error('❌ Failed to load appointments:', err));
+      .then((res) => setAppointments(res.data))
+      .catch((err) => console.error("❌ Failed to load appointments:", err));
   }, [senderId]);
 
   useEffect(() => {
     if (!selected) return;
 
     const receiverId = selected.counselorId._id;
-    const room = [senderId, receiverId].sort().join('_');
+    const room = [senderId, receiverId].sort().join("_");
 
     socket.connect();
-    socket.emit('join', room);
+    socket.emit("join", room);
 
     API.get(`/chat/appointment/${selected._id}`)
-      .then(r => setMessages(r.data))
-      .catch(err => console.error('❌ Failed to load chat:', err));
+      .then((r) => setMessages(r.data))
+      .catch((err) => console.error("❌ Failed to load chat:", err));
 
-    API.patch(`/chat/read/${selected._id}/${senderId}`).catch(err =>
-      console.error('❌ Failed to mark existing messages as read:', err)
+    API.patch(`/chat/read/${selected._id}/${senderId}`).catch((err) =>
+      console.error("❌ Failed to mark existing messages as read:", err)
     );
 
-    socket.on('receive-message', msg => {
+    socket.on("receive-message", (msg) => {
       if (msg.appointmentId === selected._id) {
-        setMessages(prev => [...prev, msg]);
+        setMessages((prev) => [...prev, msg]);
         if (msg.receiver === senderId) {
-          socket.emit('message-read', {
+          socket.emit("message-read", {
             roomId: room,
             messageId: msg._id,
             readerId: senderId,
@@ -66,32 +66,33 @@ export default function ChatInterface() {
       }
     });
 
-    socket.on('user-typing', userId => {
+    socket.on("user-typing", (userId) => {
       if (userId !== senderId) {
         setTypingUser(userId);
         setTimeout(() => setTypingUser(null), 2000);
       }
     });
 
-    socket.on('message-read', ({ messageId, readerId }) => {
-      setReadMessages(prev => ({ ...prev, [messageId]: readerId }));
+    socket.on("message-read", ({ messageId, readerId }) => {
+      setReadMessages((prev) => ({ ...prev, [messageId]: readerId }));
     });
 
     return () => {
-      socket.off('receive-message');
-      socket.off('user-typing');
-      socket.off('message-read');
+      socket.off("receive-message");
+      socket.off("user-typing");
+      socket.off("message-read");
       socket.disconnect();
     };
   }, [selected, senderId]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim() || !selected?.isPaid || selected.status === 'completed') return;
+    if (!text.trim() || !selected?.isPaid || selected.status === "completed")
+      return;
 
     const msg = {
       sender: senderId,
@@ -100,37 +101,47 @@ export default function ChatInterface() {
       appointmentId: selected._id,
     };
 
-    socket.emit('send-message', {
-      roomId: [senderId, selected.counselorId._id].sort().join('_'),
+    socket.emit("send-message", {
+      roomId: [senderId, selected.counselorId._id].sort().join("_"),
       message: msg,
     });
 
     try {
-      await API.post('/chat', msg);
-      setText('');
+      await API.post("/chat", msg);
+      setText("");
     } catch (err) {
-      console.error('❌ Failed to send message:', err);
+      console.error("❌ Failed to send message:", err);
     }
   };
 
   const handleTyping = () => {
-    const room = [senderId, selected.counselorId._id].sort().join('_');
-    socket.emit('typing', { roomId: room, userId: senderId });
+    const room = [senderId, selected.counselorId._id].sort().join("_");
+    socket.emit("typing", { roomId: room, userId: senderId });
   };
 
   const startPayment = () => {
     window.location.href = `/pay/${selected._id}`;
   };
 
-  const sendEmail = () => {
-    const recipient = selected.counselorId?.email;
+  const sendEmail = async () => {
+    const to = selected.counselorId?.email;
     const subject = `Regarding session ${selected.sessionType}`;
-    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+
+    if (!to || !emailBody.trim()) return;
+
+    try {
+      await API.post("/send-email", { to, subject, body: emailBody });
+      alert("✅ Email sent successfully!");
+      setEmailBody("");
+    } catch (err) {
+      console.error("❌ Failed to send email:", err);
+      alert("❌ Failed to send email.");
+    }
   };
 
   const formatTimestamp = (timestamp) => {
-    if (!timestamp || isNaN(Date.parse(timestamp))) return 'Just now';
-    return format(new Date(timestamp), 'MMM d, h:mm a');
+    if (!timestamp || isNaN(Date.parse(timestamp))) return "Just now";
+    return format(new Date(timestamp), "MMM d, h:mm a");
   };
 
   return (
@@ -143,28 +154,30 @@ export default function ChatInterface() {
             Counseling Sessions
           </h2>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto p-2">
           {appointments.length === 0 ? (
             <div className="text-center p-8 text-gray-500 dark:text-gray-400">
               No appointments found
             </div>
           ) : (
-            appointments.map(appt => (
+            appointments.map((appt) => (
               <div
                 key={appt._id}
                 onClick={() => setSelected(appt)}
                 className={`p-3 rounded-lg cursor-pointer transition-colors mb-2 flex items-center gap-3 ${
-                  selected?._id === appt._id 
-                    ? 'bg-indigo-50 dark:bg-gray-700' 
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                  selected?._id === appt._id
+                    ? "bg-indigo-50 dark:bg-gray-700"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
                 }`}
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
                   <UserIcon className="text-indigo-600 dark:text-indigo-400 w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{appt.counselorId.name}</p>
+                  <p className="font-medium truncate">
+                    {appt.counselorId.name}
+                  </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                     {appt.sessionType}
                   </p>
@@ -227,14 +240,14 @@ export default function ChatInterface() {
                 </div>
               </div>
               {!selected.isPaid ? (
-                <button 
+                <button
                   onClick={startPayment}
                   className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   <CreditCard className="w-4 h-4" />
                   Pay Now
                 </button>
-              ) : selected.status === 'completed' ? (
+              ) : selected.status === "completed" ? (
                 <span className="text-sm px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
                   <Check className="w-3 h-3" />
                   Session Completed
@@ -250,19 +263,25 @@ export default function ChatInterface() {
                   return (
                     <div
                       key={msg._id || i}
-                      className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${
+                        isSender ? "justify-end" : "justify-start"
+                      }`}
                     >
                       <div
                         className={`max-w-[75%] rounded-2xl p-3 ${
                           isSender
-                            ? 'bg-indigo-600 text-white rounded-tr-none'
-                            : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-tl-none'
+                            ? "bg-indigo-600 text-white rounded-tr-none"
+                            : "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-tl-none"
                         }`}
                       >
                         <div className="text-sm">{msg.message}</div>
-                        <div className={`flex items-center justify-end gap-1 mt-1 text-xs ${
-                          isSender ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400'
-                        }`}>
+                        <div
+                          className={`flex items-center justify-end gap-1 mt-1 text-xs ${
+                            isSender
+                              ? "text-indigo-200"
+                              : "text-gray-500 dark:text-gray-400"
+                          }`}
+                        >
                           {formatTimestamp(msg.createdAt || msg.timestamp)}
                           {isSender && (
                             <span className="ml-1">
@@ -291,14 +310,14 @@ export default function ChatInterface() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              {selected.isPaid && selected.status !== 'completed' ? (
+              {selected.isPaid && selected.status !== "completed" ? (
                 <form onSubmit={sendMessage} className="flex gap-2">
                   <input
                     type="text"
                     className="flex-1 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Type your message..."
                     value={text}
-                    onChange={e => {
+                    onChange={(e) => {
                       setText(e.target.value);
                       handleTyping();
                     }}
@@ -314,22 +333,24 @@ export default function ChatInterface() {
                 </form>
               ) : (
                 <div className="space-y-3">
-                  <div className={`p-3 rounded-lg flex items-center gap-2 text-sm ${
-                    selected.status === 'completed'
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                  }`}>
+                  <div
+                    className={`p-3 rounded-lg flex items-center gap-2 text-sm ${
+                      selected.status === "completed"
+                        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
+                        : "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
+                    }`}
+                  >
                     <Lock className="w-4 h-4" />
-                    {selected.status === 'completed'
-                      ? 'Chat disabled — session marked as completed'
-                      : 'Please complete payment to unlock chat'}
+                    {selected.status === "completed"
+                      ? "Chat disabled — session marked as completed"
+                      : "Please complete payment to unlock chat"}
                   </div>
                   <textarea
                     className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     rows={3}
                     placeholder={`Write email to ${selected.counselorId.name}...`}
                     value={emailBody}
-                    onChange={e => setEmailBody(e.target.value)}
+                    onChange={(e) => setEmailBody(e.target.value)}
                   />
                   <button
                     onClick={sendEmail}
