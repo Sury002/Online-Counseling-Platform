@@ -38,14 +38,24 @@ router.post('/register', async (req, res) => {
       role 
     });
     
+    // Create token for immediate login after registration
+    const token = jwt.sign(
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
+
+    const userWithoutPassword = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
     res.status(201).json({ 
       msg: 'User registered successfully',
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      token,
+      user: userWithoutPassword
     });
   } catch (err) {
     console.error(err);
@@ -53,7 +63,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
+// Login - Fixed version
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,10 +73,14 @@ router.post('/login', async (req, res) => {
     }
 
     const user = await User.findOne({ email }).select('+password');
-    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ msg: 'Invalid credentials' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(401).json({ msg: 'Invalid credentials' });
+    }
 
     const token = jwt.sign(
       { id: user._id, role: user.role }, 
