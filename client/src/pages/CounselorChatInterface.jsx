@@ -134,13 +134,24 @@ export default function CounselorChatInterface({
     socket.emit("typing", { roomId: room, userId: counselorId });
   };
 
-  const sendEmail = () => {
-    const recipient = selected.clientId?.email;
-    const subject = `Regarding your session: ${selected.sessionType}`;
+  const sendEmail = async () => {
+    const recipient = selected?.clientId?.email;
+    const subject = `Regarding your session: ${selected?.sessionType}`;
     const body = emailBody || "Hello, following up regarding our session.";
-    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
+
+    if (!recipient || !subject || !body) {
+      alert("Missing required email fields");
+      return;
+    }
+
+    try {
+      await API.post("/send-email", { to: recipient, subject, body });
+      alert("Email sent successfully!");
+      setEmailBody("");
+    } catch (error) {
+      console.error("❌ Failed to send email:", error);
+      alert("Failed to send email. Please try again later.");
+    }
   };
 
   const formatTimestamp = (timestamp) => {
@@ -346,7 +357,9 @@ export default function CounselorChatInterface({
                   <textarea
                     className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     rows={3}
-                    placeholder={`Write email to ${selected.clientId?.name}...`}
+                    placeholder={`Write email to ${
+                      selected.clientId?.name || "client"
+                    }...`}
                     value={emailBody}
                     onChange={(e) => setEmailBody(e.target.value)}
                   />
