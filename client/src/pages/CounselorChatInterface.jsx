@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { API } from "../api";
 import socket from "../socket";
 import { format } from "date-fns";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   MessageSquare,
   Lock,
@@ -13,6 +13,11 @@ import {
   Check,
   CheckCheck,
   Shield,
+  NotebookPen,
+  CalendarDays,
+  LogOut,
+  Menu,
+  ChevronLeft
 } from "lucide-react";
 
 export default function CounselorChatInterface({
@@ -30,7 +35,17 @@ export default function CounselorChatInterface({
   const [emailBody, setEmailBody] = useState("");
   const [typingUser, setTypingUser] = useState(null);
   const [readMessages, setReadMessages] = useState({});
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [showAppointments, setShowAppointments] = useState(true);
   const bottomRef = useRef();
+
+  // Close sidebars when a selection is made on mobile
+  useEffect(() => {
+    if (selected && window.innerWidth < 768) {
+      setShowSidebar(false);
+      setShowAppointments(false);
+    }
+  }, [selected]);
 
   useEffect(() => {
     if (!counselorId) return;
@@ -163,10 +178,90 @@ export default function CounselorChatInterface({
   };
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Sidebar */}
-      <aside className="w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {/* Mobile Header */}
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <button
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h1 className="text-xl font-bold">
+          {selected ? selected.clientId?.name : "Chat"}
+        </h1>
+        <button
+          onClick={() => setShowAppointments(!showAppointments)}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <MessageSquare className="w-5 h-5" />
+        </button>
+      </header>
+
+      {/* Navigation Sidebar - Mobile */}
+      <div
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
+      >
+        <div className="p-6 h-full flex flex-col">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+            Counselor Portal
+          </div>
+          
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <NotebookPen className="h-5 w-5" />
+            <span>Dashboard</span>
+          </Link>
+          
+          <Link
+            to="/appointments"
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <CalendarDays className="h-5 w-5" />
+            <span>Appointments</span>
+          </Link>
+          
+          <Link
+            to="/login"
+            onClick={() => {
+              localStorage.clear();
+              setShowSidebar(false);
+            }}
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Overlay for mobile sidebar */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
+      {/* Appointments Sidebar - Mobile */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-20 w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col transform ${
+          showAppointments ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
+      >
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
+          <button
+            onClick={() => setShowAppointments(false)}
+            className="md:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Shield className="text-indigo-600 dark:text-indigo-400" />
             Client Sessions
@@ -182,7 +277,10 @@ export default function CounselorChatInterface({
             appointments.map((appt) => (
               <div
                 key={appt._id}
-                onClick={() => navigate(`/chat/counselor/${appt._id}`)}
+                onClick={() => {
+                  navigate(`/chat/counselor/${appt._id}`);
+                  setSelected(appt);
+                }}
                 className={`p-3 rounded-lg cursor-pointer transition-colors mb-2 flex items-center gap-3 ${
                   selected?._id === appt._id
                     ? "bg-indigo-50 dark:bg-gray-700"
@@ -223,8 +321,16 @@ export default function CounselorChatInterface({
         </div>
       </aside>
 
+      {/* Overlay for mobile appointments */}
+      {showAppointments && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          onClick={() => setShowAppointments(false)}
+        />
+      )}
+
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-full">
         {!selected ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
             <MessageSquare className="w-12 h-12 mb-4 text-gray-300 dark:text-gray-600" />
@@ -232,9 +338,15 @@ export default function CounselorChatInterface({
           </div>
         ) : (
           <>
-            {/* Chat Header */}
+            {/* Chat Header - Mobile */}
             <header className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setSelected(null)}
+                  className="md:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
                   <UserIcon className="text-indigo-600 dark:text-indigo-400 w-5 h-5" />
                 </div>
@@ -253,7 +365,8 @@ export default function CounselorChatInterface({
               {!selected.isPaid && (
                 <span className="text-sm px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 flex items-center gap-2">
                   <Lock className="w-3 h-3" />
-                  Chat Locked
+                  <span className="hidden md:inline">Chat Locked</span>
+                  <span className="md:hidden">Locked</span>
                 </span>
               )}
             </header>
@@ -271,7 +384,7 @@ export default function CounselorChatInterface({
                       }`}
                     >
                       <div
-                        className={`max-w-[75%] rounded-2xl p-3 ${
+                        className={`max-w-[85%] md:max-w-[75%] rounded-2xl p-3 ${
                           isSender
                             ? "bg-indigo-600 text-white rounded-tr-none"
                             : "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-tl-none"
@@ -311,7 +424,6 @@ export default function CounselorChatInterface({
               </div>
             </div>
 
-            {/* Input Area */}
             {/* Input Area */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               {selected.isPaid && selected.status === "pending" ? (

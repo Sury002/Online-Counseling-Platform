@@ -5,6 +5,8 @@ import { API } from '../api';
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,30 +16,40 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     try {
-      const res = await API.post('/auth/login', form);
-      const { token, user } = res.data;
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      if (user.role === 'counselor') {
-        navigate('/dashboard/counselor');
+      if (isForgotPassword) {
+        await API.post('/auth/forgot-password', { email: form.email });
+        setSuccess('Password reset link sent to your email');
+        setIsForgotPassword(false);
       } else {
-        navigate('/dashboard/client');
+        const res = await API.post('/auth/login', form);
+        const { token, user } = res.data;
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        if (user.role === 'counselor') {
+          navigate('/dashboard/counselor');
+        } else {
+          navigate('/dashboard/client');
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.msg || 'Login failed');
+      setError(err.response?.data?.msg || (isForgotPassword ? 'Failed to send reset link' : 'Login failed'));
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          {isForgotPassword ? 'Reset Password' : 'Login'}
+        </h2>
 
         {error && <p className="text-red-600 text-sm mb-4 text-center">{error}</p>}
+        {success && <p className="text-green-600 text-sm mb-4 text-center">{success}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -52,29 +64,55 @@ export default function Login() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          {!isForgotPassword && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
 
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
           >
-            Login
+            {isForgotPassword ? 'Send Reset Link' : 'Login'}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
-        </p>
+        <div className="mt-4 text-center space-y-2">
+          {!isForgotPassword ? (
+            <>
+              <p className="text-sm text-gray-600">
+                <button 
+                  onClick={() => setIsForgotPassword(true)}
+                  className="text-blue-600 hover:underline"
+                >
+                  Forgot password?
+                </button>
+              </p>
+              <p className="text-sm text-gray-600">
+                Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-gray-600">
+              Remember your password?{' '}
+              <button 
+                onClick={() => setIsForgotPassword(false)}
+                className="text-blue-600 hover:underline"
+              >
+                Login
+              </button>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { API } from '../api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Video,
   PhoneCall,
@@ -8,13 +8,29 @@ import {
   Calendar,
   User,
   ArrowRight,
-  Check
+  Check,
+  NotebookPen,
+  CalendarDays,
+  LogOut,
+  Menu,
+  ChevronLeft,
+  Shield
 } from 'lucide-react';
 
 export default function CounselorCallInterface({ counselorId }) {
   const [appointments, setAppointments] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [showAppointments, setShowAppointments] = useState(true);
   const navigate = useNavigate();
+
+  // Close sidebars when a selection is made on mobile
+  useEffect(() => {
+    if (selected && window.innerWidth < 768) {
+      setShowSidebar(false);
+      setShowAppointments(false);
+    }
+  }, [selected]);
 
   useEffect(() => {
     if (!counselorId) return;
@@ -30,69 +46,161 @@ export default function CounselorCallInterface({ counselorId }) {
   };
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Sidebar */}
-      <aside className="w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 overflow-y-auto">
-        <div className="flex items-center gap-3 mb-6">
-          <Video className="text-indigo-600 dark:text-indigo-400" />
-          <h2 className="text-xl font-bold">Client Sessions</h2>
+    <div className="h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {/* Mobile Header */}
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <button
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h1 className="text-xl font-bold">
+          {selected ? selected.clientId?.name : "Video Call"}
+        </h1>
+        <button
+          onClick={() => setShowAppointments(!showAppointments)}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <Video className="w-5 h-5" />
+        </button>
+      </header>
+
+      {/* Navigation Sidebar - Mobile */}
+      <div
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
+      >
+        <div className="p-6 h-full flex flex-col">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+            Counselor Portal
+          </div>
+          
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <NotebookPen className="h-5 w-5" />
+            <span>Dashboard</span>
+          </Link>
+          
+          <Link
+            to="/appointments"
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <CalendarDays className="h-5 w-5" />
+            <span>Appointments</span>
+          </Link>
+          
+          <Link
+            to="/login"
+            onClick={() => {
+              localStorage.clear();
+              setShowSidebar(false);
+            }}
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Overlay for mobile sidebar */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
+      {/* Appointments Sidebar - Mobile */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-20 w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col transform ${
+          showAppointments ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
+      >
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
+          <button
+            onClick={() => setShowAppointments(false)}
+            className="md:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Shield className="text-indigo-600 dark:text-indigo-400" />
+            Client Sessions
+          </h2>
         </div>
 
-        {appointments.length === 0 ? (
-          <div className="text-center p-6 text-gray-500 dark:text-gray-400">
-            No scheduled sessions
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {appointments.map(appt => (
-              <div
-                key={appt._id}
-                onClick={() => setSelected(appt)}
-                className={`p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between ${
-                  selected?._id === appt._id
-                    ? 'bg-indigo-50 dark:bg-gray-700'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                }`}
-              >
-                <div>
-                  <p className="font-medium">{appt.clientId?.name}</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>
-                      {new Date(appt.date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
+        <div className="flex-1 overflow-y-auto p-4">
+          {appointments.length === 0 ? (
+            <div className="text-center p-8 text-gray-500 dark:text-gray-400">
+              No scheduled sessions
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {appointments.map(appt => (
+                <div
+                  key={appt._id}
+                  onClick={() => setSelected(appt)}
+                  className={`p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between ${
+                    selected?._id === appt._id
+                      ? 'bg-indigo-50 dark:bg-gray-700'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                  }`}
+                >
+                  <div>
+                    <p className="font-medium">{appt.clientId?.name}</p>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>
+                        {new Date(appt.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      {appt.status === 'completed' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          Completed
+                        </span>
+                      )}
+                      {!appt.isPaid ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                          <Lock className="w-3 h-3" />
+                          Unpaid
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          Paid
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    {appt.status === 'completed' && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        Completed
-                      </span>
-                    )}
-                    {!appt.isPaid ? (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center gap-1">
-                        <Lock className="w-3 h-3" />
-                        Unpaid
-                      </span>
-                    ) : (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        Paid
-                      </span>
-                    )}
-                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </aside>
+
+      {/* Overlay for mobile appointments */}
+      {showAppointments && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          onClick={() => setShowAppointments(false)}
+        />
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-900">

@@ -9,11 +9,13 @@ import {
   CreditCard,
   LogOut,
   CheckCircle,
+  Menu
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CounselorAppointments({ userId }) {
   const [appointments, setAppointments] = useState([]);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -25,11 +27,11 @@ export default function CounselorAppointments({ userId }) {
   const getStatusStyles = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200";
       default:
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200";
     }
   };
 
@@ -44,18 +46,6 @@ export default function CounselorAppointments({ userId }) {
     }
   };
 
-  function SidebarLink({ to, icon, label }) {
-    return (
-      <Link
-        to={to}
-        className="flex items-center gap-3 text-white hover:text-blue-400 transition mb-4"
-      >
-        {icon}
-        <span>{label}</span>
-      </Link>
-    );
-  }
-
   const isInteractionAllowed = (app) => {
     return (
       app.status?.toLowerCase() === "pending" &&
@@ -64,138 +54,195 @@ export default function CounselorAppointments({ userId }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-zinc-900 text-white">
-      {/* Sidebar */}
-      <aside className="w-64 bg-zinc-800 border-r p-6 hidden md:flex flex-col">
-        <h2 className="text-2xl font-bold flex items-center gap-2 mb-8">
-          <NotebookPen className="text-blue-400" /> Counselor
-        </h2>
-        <SidebarLink
-          icon={<NotebookPen />}
-          label="Dashboad"
-          to="/dashboard/counselor"
+    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-zinc-900 to-zinc-800 text-white">
+      {/* Mobile Header */}
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-zinc-700 bg-zinc-800">
+        <button
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="p-2 rounded-lg hover:bg-zinc-700"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h1 className="text-xl font-bold">Your Appointments</h1>
+        <div className="w-10"></div> {/* Spacer for alignment */}
+      </header>
+
+      {/* Navigation Sidebar - Mobile */}
+      <div
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-zinc-800 border-r border-zinc-700 transform ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
+      >
+        <div className="p-6 h-full flex flex-col">
+          <div className="text-2xl font-bold text-white mb-8">
+            Counselor
+          </div>
+          
+          <Link
+            to="/dashboard/counselor"
+            className="flex items-center gap-3 text-zinc-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <NotebookPen className="h-5 w-5" />
+            <span>Dashboard</span>
+          </Link>
+          
+          <Link
+            to="/login"
+            onClick={() => {
+              localStorage.clear();
+              setShowSidebar(false);
+            }}
+            className="flex items-center gap-3 text-zinc-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Overlay for mobile sidebar */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          onClick={() => setShowSidebar(false)}
         />
-       <SidebarLink icon={<LogOut />} label="Logout" to="/login" />
-      </aside>
+      )}
 
       {/* Main Content */}
-      <main className="flex-1 px-6 py-10">
-        <h1 className="text-3xl font-bold mb-6">📅 Your Appointments</h1>
-        {appointments.length === 0 ? (
-          <p className="text-gray-400">No appointments to show.</p>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {appointments.map((app) => {
-              const interactionAllowed = isInteractionAllowed(app);
-              return (
-                <div
-                  key={app._id}
-                  className="bg-zinc-800 p-6 rounded-xl shadow-md space-y-4"
-                >
-                  {/* Status Badge */}
-                  <div
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusStyles(
-                      app.status
-                    )}`}
-                  >
-                    {app.status?.charAt(0).toUpperCase() +
-                      app.status?.slice(1)}
-                  </div>
-
-                  {/* Payment Badge */}
-                  <div
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                      app.isPaid
-                        ? "bg-green-200 text-green-800"
-                        : "bg-red-200 text-red-800"
-                    } flex items-center gap-1`}
-                  >
-                    <CreditCard size={14} />
-                    {app.isPaid ? "Paid" : "Unpaid"}
-                  </div>
-
-                  {/* Client Info */}
-                  <div className="flex items-center gap-3">
-                    <UserCircle2 className="w-10 h-10 text-blue-400" />
-                    <div>
-                      <p className="font-bold">{app.clientId?.name}</p>
-                      <p className="text-sm text-gray-300">
-                        {app.sessionType}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {new Date(app.date).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Chat, Notes, Call Buttons */}
-                  <div className="flex flex-wrap gap-3">
-                    {/* Chat */}
-                    <Link
-                      to={
-                        interactionAllowed
-                          ? `/chat/counselor/${app._id}`
-                          : "#"
-                      }
-                      onClick={(e) => {
-                        if (!interactionAllowed) e.preventDefault();
-                      }}
-                      className={`flex items-center gap-2 px-4 py-2 rounded transition ${
-                        interactionAllowed
-                          ? "bg-purple-600 hover:bg-purple-700 text-white"
-                          : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      <MessageCircle size={18} /> Chat
-                    </Link>
-
-                    {/* Notes */}
-                    <Link
-                      to={interactionAllowed ? `/notes/${app._id}` : "#"}
-                      onClick={(e) => {
-                        if (!interactionAllowed) e.preventDefault();
-                      }}
-                      className={`flex items-center gap-2 px-4 py-2 rounded transition ${
-                        interactionAllowed
-                          ? "bg-blue-600 hover:bg-blue-700 text-white"
-                          : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      <NotebookPen size={18} />
-                      Notes
-                    </Link>
-
-                    {/* Video Call */}
-                    <Link
-                      to={interactionAllowed ? `/video-call/${app._id}` : "#"}
-                      onClick={(e) => {
-                        if (!interactionAllowed) e.preventDefault();
-                      }}
-                      className={`flex items-center gap-2 px-4 py-2 rounded transition ${
-                        interactionAllowed
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      <Video size={18} /> Join Call
-                    </Link>
-                  </div>
-
-                  {/* ✅ Mark as Completed */}
-                  {interactionAllowed && (
-                    <button
-                      onClick={() => handleMarkCompleted(app._id)}
-                      className="w-full mt-3 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded transition"
-                    >
-                      <CheckCircle size={18} /> Mark as Completed
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+      <div className="flex-1 p-4 md:p-8 overflow-auto">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+              Your Appointments
+            </h2>
+            <p className="text-zinc-400">Manage your upcoming and past counseling sessions</p>
           </div>
-        )}
-      </main>
+
+          {appointments.length === 0 ? (
+            <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-8 text-center">
+              <p className="text-zinc-400 text-lg">No appointments scheduled</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6">
+              {appointments.map((app) => {
+                const interactionAllowed = isInteractionAllowed(app);
+                return (
+                  <div
+                    key={app._id}
+                    className="bg-zinc-800/70 hover:bg-zinc-800/90 transition-all p-6 rounded-xl border border-zinc-700/50 shadow-lg backdrop-blur-sm"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      {/* Status Badge */}
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusStyles(
+                          app.status
+                        )}`}
+                      >
+                        {app.status?.charAt(0).toUpperCase() +
+                          app.status?.slice(1)}
+                      </span>
+
+                      {/* Payment Badge */}
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                          app.isPaid
+                            ? "bg-green-600/20 text-green-400"
+                            : "bg-red-600/20 text-red-400"
+                        }`}
+                      >
+                        <CreditCard size={14} />
+                        {app.isPaid ? "Paid" : "Unpaid"}
+                      </span>
+                    </div>
+
+                    {/* Client Info */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <UserCircle2 className="w-10 h-10 text-blue-400" />
+                      <div>
+                        <h3 className="font-bold">{app.clientId?.name}</h3>
+                        <p className="text-sm text-zinc-300">{app.sessionType}</p>
+                        <p className="text-xs text-zinc-500">
+                          {new Date(app.date).toLocaleString('en-IN', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {/* Chat Button */}
+                      <Link
+                        to={
+                          interactionAllowed
+                            ? `/chat/counselor/${app._id}`
+                            : "#"
+                        }
+                        onClick={(e) => {
+                          if (!interactionAllowed) e.preventDefault();
+                        }}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                          interactionAllowed
+                            ? "bg-purple-600 hover:bg-purple-500 text-white"
+                            : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                        }`}
+                      >
+                        <MessageCircle size={16} /> Chat
+                      </Link>
+
+                      {/* Notes Button */}
+                      <Link
+                        to={interactionAllowed ? `/notes/${app._id}` : "#"}
+                        onClick={(e) => {
+                          if (!interactionAllowed) e.preventDefault();
+                        }}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                          interactionAllowed
+                            ? "bg-blue-600 hover:bg-blue-500 text-white"
+                            : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                        }`}
+                      >
+                        <NotebookPen size={16} /> Notes
+                      </Link>
+
+                      {/* Video Call Button */}
+                      <Link
+                        to={interactionAllowed ? `/video-call/${app._id}` : "#"}
+                        onClick={(e) => {
+                          if (!interactionAllowed) e.preventDefault();
+                        }}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                          interactionAllowed
+                            ? "bg-green-600 hover:bg-green-500 text-white"
+                            : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                        }`}
+                      >
+                        <Video size={16} /> Call
+                      </Link>
+                    </div>
+
+                    {/* Complete Button */}
+                    {interactionAllowed && (
+                      <button
+                        onClick={() => handleMarkCompleted(app._id)}
+                        className="w-full mt-4 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm"
+                      >
+                        <CheckCircle size={16} /> Mark Completed
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
