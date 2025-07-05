@@ -16,6 +16,8 @@ import {
   SignalSlashIcon,
   CheckCircleIcon,
   XCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 
 export default function VideoCall() {
@@ -31,6 +33,7 @@ export default function VideoCall() {
   const [connectionQuality, setConnectionQuality] = useState("good");
   const [networkStats, setNetworkStats] = useState(null);
   const [callStatus, setCallStatus] = useState("connecting");
+  const [showHeaderInfo, setShowHeaderInfo] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -377,76 +380,93 @@ export default function VideoCall() {
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex justify-between items-center border-b border-gray-700/50 z-10">
-        <div className="flex items-center space-x-4">
-          <div className={`p-2 rounded-lg shadow-lg ${
-            callStatus === "connected" ? "bg-green-600" : 
-            callStatus === "failed" ? "bg-red-600" : "bg-blue-600"
-          }`}>
-            {callStatus === "connected" ? (
-              <CheckCircleIcon className="h-6 w-6" />
-            ) : callStatus === "failed" ? (
-              <XCircleIcon className="h-6 w-6" />
-            ) : (
-              <VideoCameraIcon className="h-6 w-6" />
+      <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex flex-col border-b border-gray-700/50 z-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className={`p-2 rounded-lg shadow-lg ${
+              callStatus === "connected" ? "bg-green-600" : 
+              callStatus === "failed" ? "bg-red-600" : "bg-blue-600"
+            }`}>
+              {callStatus === "connected" ? (
+                <CheckCircleIcon className="h-6 w-6" />
+              ) : callStatus === "failed" ? (
+                <XCircleIcon className="h-6 w-6" />
+              ) : (
+                <VideoCameraIcon className="h-6 w-6" />
+              )}
+            </div>
+            <div>
+              <h2 className="text-lg md:text-xl font-semibold flex items-center">
+                Call with {otherParticipant.name}
+                <span className="ml-2 text-xs px-2 py-1 rounded-full bg-gray-700 hidden sm:inline">
+                  {connectionQuality === "good"
+                    ? "✓ Good"
+                    : connectionQuality === "average"
+                    ? "⚠ Average"
+                    : "✗ Poor"}
+                </span>
+              </h2>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            {networkStats && (
+              <div className="hidden md:flex items-center space-x-2 text-xs bg-gray-700/80 px-3 py-1.5 rounded-full">
+                <SignalIcon className="h-3 w-3 text-green-400" />
+                <span>↑ {networkStats.uplink}</span>
+                <span>↓ {networkStats.downlink}</span>
+                <span>Loss: {networkStats.packetLoss}</span>
+              </div>
             )}
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold flex items-center">
-              Video Call with {otherParticipant.name}
-              <span className="ml-2 text-xs px-2 py-1 rounded-full bg-gray-700">
-                {connectionQuality === "good"
-                  ? "✓ Good connection"
-                  : connectionQuality === "average"
-                  ? "⚠ Average connection"
-                  : "✗ Poor connection"}
-              </span>
-            </h2>
-            <div className="flex items-center space-x-4 text-sm text-gray-300">
-              <div className="flex items-center">
-                <UserIcon className="h-4 w-4 mr-1" />
-                <span>{appointment.sessionType}</span>
-              </div>
-              <div className="flex items-center">
-                <CalendarIcon className="h-4 w-4 mr-1" />
-                <span>{new Date(appointment.date).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center">
-                <ClockIcon className="h-4 w-4 mr-1" />
-                <span>{formatTime(callDuration)}</span>
-              </div>
-            </div>
+            <button
+              onClick={() => setShowHeaderInfo(!showHeaderInfo)}
+              className="md:hidden p-2 rounded-full hover:bg-gray-700 transition-colors"
+              aria-label="Toggle info"
+            >
+              {showHeaderInfo ? (
+                <ChevronUpIcon className="h-5 w-5" />
+              ) : (
+                <ChevronDownIcon className="h-5 w-5" />
+              )}
+            </button>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 rounded-full hover:bg-gray-700 transition-colors"
+              aria-label="Settings"
+            >
+              <Cog6ToothIcon className="h-5 w-5" />
+            </button>
+            <button
+              onClick={leaveCall}
+              className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-white font-medium transition-all shadow-lg hover:shadow-red-600/20"
+            >
+              <PhoneIcon className="h-5 w-5 rotate-[135deg]" />
+              <span className="hidden md:inline">End Call</span>
+            </button>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
-          {networkStats && (
-            <div className="hidden md:flex items-center space-x-2 text-xs bg-gray-700/80 px-3 py-1.5 rounded-full">
-              <SignalIcon className="h-3 w-3 text-green-400" />
-              <span>↑ {networkStats.uplink}</span>
-              <span>↓ {networkStats.downlink}</span>
-              <span>Loss: {networkStats.packetLoss}</span>
+
+        {/* Collapsible header info for mobile */}
+        {(showHeaderInfo || window.innerWidth >= 768) && (
+          <div className="flex items-center space-x-4 text-sm text-gray-300 mt-2">
+            <div className="flex items-center">
+              <UserIcon className="h-4 w-4 mr-1" />
+              <span>{appointment.sessionType}</span>
             </div>
-          )}
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-            aria-label="Settings"
-          >
-            <Cog6ToothIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={leaveCall}
-            className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white font-medium transition-all shadow-lg hover:shadow-red-600/20"
-          >
-            <PhoneIcon className="h-5 w-5 rotate-[135deg]" />
-            <span>End Call</span>
-          </button>
-        </div>
+            <div className="flex items-center">
+              <CalendarIcon className="h-4 w-4 mr-1" />
+              <span>{new Date(appointment.date).toLocaleDateString()}</span>
+            </div>
+            <div className="flex items-center">
+              <ClockIcon className="h-4 w-4 mr-1" />
+              <span>{formatTime(callDuration)}</span>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="absolute right-4 top-16 bg-gray-800 rounded-lg shadow-xl p-4 z-20 w-64 border border-gray-700">
+        <div className="absolute right-4 top-16 md:top-20 bg-gray-800 rounded-lg shadow-xl p-4 z-20 w-64 border border-gray-700">
           <h3 className="font-medium mb-3 flex items-center">
             <Cog6ToothIcon className="h-5 w-5 mr-2" />
             Call Settings
@@ -510,13 +530,13 @@ export default function VideoCall() {
         {/* Local video (pip) */}
         <div
           ref={localVideoRef}
-          className="absolute bottom-4 right-4 w-64 h-48 bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-600 shadow-xl transition-all hover:border-blue-500"
+          className="absolute bottom-20 md:bottom-4 right-4 w-32 h-48 md:w-64 md:h-48 bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-600 shadow-xl transition-all hover:border-blue-500"
         >
           {!camEnabled && (
             <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
               <div className="text-center p-4">
-                <VideoCameraSlashIcon className="h-8 w-8 text-gray-500 mx-auto mb-2" />
-                <p className="text-gray-400 text-sm">Your camera is off</p>
+                <VideoCameraSlashIcon className="h-6 w-6 text-gray-500 mx-auto mb-1 md:h-8 md:w-8 md:mb-2" />
+                <p className="text-gray-400 text-xs md:text-sm">Your camera is off</p>
               </div>
             </div>
           )}
@@ -531,35 +551,35 @@ export default function VideoCall() {
       </div>
 
       {/* Controls */}
-      <div className="p-4 bg-gray-800/80 backdrop-blur-sm border-t border-gray-700/50 flex justify-center space-x-6">
+      <div className="p-2 md:p-4 bg-gray-800/80 backdrop-blur-sm border-t border-gray-700/50 flex justify-center space-x-2 md:space-x-6">
         <button
           onClick={toggleMic}
-          className={`flex flex-col items-center justify-center px-6 py-3 rounded-xl text-white font-medium transition-all ${
+          className={`flex flex-col items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl text-white font-medium transition-all ${
             micEnabled
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-red-500/90 hover:bg-red-600/90"
           } shadow-lg hover:shadow-${micEnabled ? "gray" : "red"}-600/20`}
         >
           {micEnabled ? (
-            <MicrophoneIcon className="h-6 w-6 mb-1" />
+            <MicrophoneIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
           ) : (
-            <NoSymbolIcon className="h-6 w-6 mb-1" />
+            <NoSymbolIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
           )}
           <span className="text-xs">{micEnabled ? "Mute" : "Unmute"}</span>
         </button>
 
         <button
           onClick={toggleCam}
-          className={`flex flex-col items-center justify-center px-6 py-3 rounded-xl text-white font-medium transition-all ${
+          className={`flex flex-col items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl text-white font-medium transition-all ${
             camEnabled
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-red-500/90 hover:bg-red-600/90"
           } shadow-lg hover:shadow-${camEnabled ? "gray" : "red"}-600/20`}
         >
           {camEnabled ? (
-            <VideoCameraIcon className="h-6 w-6 mb-1" />
+            <VideoCameraIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
           ) : (
-            <VideoCameraSlashIcon className="h-6 w-6 mb-1" />
+            <VideoCameraSlashIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
           )}
           <span className="text-xs">
             {camEnabled ? "Stop Video" : "Start Video"}
@@ -568,9 +588,9 @@ export default function VideoCall() {
 
         <button
           onClick={leaveCall}
-          className="flex flex-col items-center justify-center px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all shadow-lg hover:shadow-red-600/20"
+          className="flex flex-col items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all shadow-lg hover:shadow-red-600/20"
         >
-          <PhoneIcon className="h-6 w-6 mb-1 rotate-[135deg]" />
+          <PhoneIcon className="h-5 w-5 md:h-6 md:w-6 mb-1 rotate-[135deg]" />
           <span className="text-xs">End Call</span>
         </button>
       </div>
