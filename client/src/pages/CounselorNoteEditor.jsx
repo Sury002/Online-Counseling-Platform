@@ -80,12 +80,7 @@ export default function CounselorNoteEditor() {
   const handleSave = async () => {
     try {
       setLoading(true);
-      const endpoint =
-        note === ""
-          ? `/notes/${appointmentId}`
-          : `/notes/${appointmentId}/update`;
-
-      await API.post(endpoint, {
+      await API.put(`/notes/${appointmentId}`, {
         content: note,
         counselorId,
       });
