@@ -11,13 +11,16 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ msg: "User already exists" });
 
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashed, role });
+    const user = new User({ name, email, password, role }); // No hashing here
+    await user.save();
+
     res.status(201).json({ msg: "User registered successfully" });
   } catch (err) {
+    console.error("❌ Registration Error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -46,16 +49,16 @@ router.post("/login", async (req, res) => {
 module.exports = router;
 
 // Forgot Password
-router.post('/forgot-password', async (req, res) => {
+router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.json({ msg: 'If user exists, reset email will be sent' });
+      return res.json({ msg: "If user exists, reset email will be sent" });
     }
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
@@ -75,17 +78,16 @@ router.post('/forgot-password', async (req, res) => {
 
     await sendEmail({
       to: user.email,
-      subject: 'Password Reset Request',
+      subject: "Password Reset Request",
       html: message,
     });
 
-    res.json({ msg: 'If user exists, reset email will be sent' });
+    res.json({ msg: "If user exists, reset email will be sent" });
   } catch (err) {
-    console.error('❌ Forgot Password Error:', err);
-    res.status(500).json({ msg: 'Server error' });
+    console.error("❌ Forgot Password Error:", err);
+    res.status(500).json({ msg: "Server error" });
   }
 });
-
 
 // Reset Password
 router.post("/reset-password", async (req, res) => {
