@@ -56,6 +56,10 @@ mongoose
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB Error:', err));
 
+app.get("/", (req, res) => {
+  res.send("API is live ✅");
+});
+  
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/chat', require('./routes/chat')); // ✅ Uses updated chat.js
@@ -64,6 +68,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api', emailRoutes);
+
 
 
 // ✅ Socket handling moved to its own file
