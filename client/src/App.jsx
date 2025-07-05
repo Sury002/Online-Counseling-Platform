@@ -24,6 +24,8 @@ import PaymentCancel from "./pages/PaymentCancel";
 import PrivateRoute from "./pages/PrivateRoute";
 import SessionHistory from "./pages/SessionHistory";
 import CounselorNoteEditor from "./pages/CounselorNoteEditor";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -48,6 +50,8 @@ function App() {
         {/* Public */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Client */}
         <Route

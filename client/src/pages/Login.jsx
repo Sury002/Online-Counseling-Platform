@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { API } from '../api';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { API } from "../api";
 
 export default function Login() {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -13,22 +13,22 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
-      const res = await API.post('/auth/login', form);
+      const res = await API.post("/auth/login", form);
       const { token, user } = res.data;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      if (user.role === 'counselor') {
-        navigate('/dashboard/counselor');
+      if (user.role === "counselor") {
+        navigate("/dashboard/counselor");
       } else {
-        navigate('/dashboard/client');
+        navigate("/dashboard/client");
       }
     } catch (err) {
-      setError(err.response?.data?.msg || 'Login failed');
+      setError(err.response?.data?.msg || "Login failed");
     }
   };
 
@@ -37,11 +37,15 @@ export default function Login() {
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
-        {error && <p className="text-red-600 text-sm mb-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-600 text-sm mb-4 text-center">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -53,7 +57,9 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -70,10 +76,16 @@ export default function Login() {
           >
             Login
           </button>
+          <p className="text-sm text-blue-600 mt-4">
+            <a href="/forgot-password">Forgot password?</a>
+          </p>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
+          Don't have an account?{" "}
+          <a href="/register" className="text-blue-600 hover:underline">
+            Register
+          </a>
         </p>
       </div>
     </div>
