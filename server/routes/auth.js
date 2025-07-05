@@ -45,16 +45,16 @@ router.post("/login", async (req, res) => {
 module.exports = router;
 
 // Forgot Password
-router.post("/forgot-password", async (req, res) => {
+router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.json({ msg: "If user exists, reset email will be sent" });
+      return res.json({ msg: 'If user exists, reset email will be sent' });
     }
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
@@ -62,22 +62,29 @@ router.post("/forgot-password", async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     const message = `
-      <p>You requested a password reset</p>
-      <p><a href="${resetUrl}">Reset Password</a></p>
+      <h2>Password Reset</h2>
+      <p>Click below to reset your password:</p>
+      <a href="${resetUrl}">${resetUrl}</a>
+      <p>This link expires in 1 hour.</p>
     `;
+
+    // 🧪 Log for debugging
+    console.log("Sending email to:", user.email);
+    console.log("Reset link:", resetUrl);
 
     await sendEmail({
       to: user.email,
-      subject: "Password Reset Request",
+      subject: 'Password Reset Request',
       html: message,
     });
 
-    res.json({ msg: "If user exists, reset email will be sent" });
+    res.json({ msg: 'If user exists, reset email will be sent' });
   } catch (err) {
-    console.error("❌ Forgot Password Error:", err); // Add this
-    res.status(500).json({ msg: "Server error" });
+    console.error('❌ Forgot Password Error:', err);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
+
 
 // Reset Password
 router.post("/reset-password", async (req, res) => {
