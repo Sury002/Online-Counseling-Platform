@@ -64,6 +64,7 @@ router.post('/forgot-password', async (req, res) => {
     subject: 'Password Reset Link',
     html
   });
+  console.log('Reset email sent to:', user.email);
 
   res.json({ msg: 'Reset link sent to your email' });
 });
