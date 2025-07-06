@@ -220,9 +220,9 @@ export default function Dashboard() {
             color="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20"
           />
           <FeatureCard
-            title="Session History"
+            title="Session Notes"
             description="Access notes from previous sessions."
-            icon={<BrainCircuit className="text-emerald-500 w-5 h-5" />}
+            icon={<FileText className="text-emerald-500 w-5 h-5" />}
             color="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20"
           />
         </section>
