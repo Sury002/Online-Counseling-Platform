@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { API } from '../api';
-import { Link } from 'react-router-dom';  // Correct import for Link
-import { loadStripe } from '@stripe/stripe-js';
+import { useEffect, useState } from "react";
+import { API } from "../api";
+import { Link } from "react-router-dom"; // Correct import for Link
+import { loadStripe } from "@stripe/stripe-js";
 import {
   CalendarDays,
   UserCircle2,
@@ -12,13 +12,12 @@ import {
   NotebookPen,
   LogOut,
   Menu,
-  ChevronLeft
-} from 'lucide-react';
+} from "lucide-react";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export default function PayForSession() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const [appointments, setAppointments] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
   const [error, setError] = useState(null);
@@ -32,13 +31,13 @@ export default function PayForSession() {
           (a) =>
             !a.isPaid &&
             a.clientId._id === user._id &&
-            a.status?.toLowerCase() !== 'cancelled'
+            a.status?.toLowerCase() !== "cancelled"
         );
         setAppointments(unpaid);
       })
       .catch((err) => {
         console.error(err);
-        setError('Failed to load unpaid appointments');
+        setError("Failed to load unpaid appointments");
       });
   }, [user?._id]);
 
@@ -49,7 +48,7 @@ export default function PayForSession() {
     try {
       const stripe = await stripePromise;
 
-      const res = await API.post('/payments/create-checkout-session', {
+      const res = await API.post("/payments/create-checkout-session", {
         amount: appointment.amount || 499,
         counselorName: appointment.counselorId.name,
         clientEmail: appointment.clientId.email,
@@ -59,8 +58,8 @@ export default function PayForSession() {
 
       window.location.href = res.data.url;
     } catch (err) {
-      console.error('❌ Payment failed:', err);
-      setError('Payment failed. Try again.');
+      console.error("❌ Payment failed:", err);
+      setError("Payment failed. Try again.");
     } finally {
       setLoadingId(null);
     }
@@ -80,7 +79,7 @@ export default function PayForSession() {
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">Unpaid Appointments</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
+        <div className="w-10"></div>
       </header>
 
       {/* Navigation Sidebar - Mobile */}
@@ -90,10 +89,8 @@ export default function PayForSession() {
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
         <div className="p-6 h-full flex flex-col">
-          <div className="text-2xl font-bold text-white mb-8">
-            Payments
-          </div>
-          
+          <div className="text-2xl font-bold text-white mb-8">Payments</div>
+
           <Link
             to="/dashboard"
             className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
@@ -102,7 +99,7 @@ export default function PayForSession() {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+
           <Link
             to="/appointments"
             className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
@@ -111,7 +108,7 @@ export default function PayForSession() {
             <CalendarDays className="h-5 w-5" />
             <span>Appointments</span>
           </Link>
-          
+
           <Link
             to="/login"
             onClick={() => {
@@ -141,7 +138,9 @@ export default function PayForSession() {
             <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">
               Unpaid Appointments
             </h2>
-            <p className="text-zinc-400">Complete your payments to secure your sessions</p>
+            <p className="text-zinc-400">
+              Complete your payments to secure your sessions
+            </p>
           </div>
 
           {error && (
@@ -153,7 +152,9 @@ export default function PayForSession() {
 
           {appointments.length === 0 ? (
             <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-8 text-center">
-              <p className="text-zinc-400 text-lg">You have no unpaid appointments</p>
+              <p className="text-zinc-400 text-lg">
+                You have no unpaid appointments
+              </p>
             </div>
           ) : (
             <div className="grid gap-5">
@@ -164,31 +165,43 @@ export default function PayForSession() {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                     <InfoRow
-                      icon={<CalendarDays size={18} className="text-purple-400" />}
+                      icon={
+                        <CalendarDays size={18} className="text-purple-400" />
+                      }
                       label="Session"
-                      value={<span className="font-medium">{appt.sessionType}</span>}
+                      value={
+                        <span className="font-medium">{appt.sessionType}</span>
+                      }
                     />
                     <InfoRow
                       icon={<UserCircle2 size={18} className="text-blue-400" />}
                       label="Counselor"
-                      value={<span className="font-medium">{appt.counselorId.name}</span>}
+                      value={
+                        <span className="font-medium">
+                          {appt.counselorId.name}
+                        </span>
+                      }
                     />
                     <InfoRow
                       icon={<Clock size={18} className="text-amber-400" />}
                       label="Date"
-                      value={new Date(appt.date).toLocaleString('en-IN', {
-                        weekday: 'short',
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
+                      value={new Date(appt.date).toLocaleString("en-IN", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     />
                     <InfoRow
-                      icon={<CreditCard size={18} className="text-emerald-400" />}
+                      icon={
+                        <CreditCard size={18} className="text-emerald-400" />
+                      }
                       label="Amount"
-                      value={<span className="font-bold">₹{appt.amount || 499}</span>}
+                      value={
+                        <span className="font-bold">₹{appt.amount || 499}</span>
+                      }
                     />
                   </div>
 
@@ -197,8 +210,8 @@ export default function PayForSession() {
                     disabled={loadingId === appt._id}
                     className={`w-full px-4 py-3 rounded-lg font-medium flex items-center justify-center transition-all ${
                       loadingId === appt._id
-                        ? 'bg-purple-600/70 cursor-not-allowed'
-                        : 'bg-purple-600 hover:bg-purple-500 shadow-md hover:shadow-purple-500/20'
+                        ? "bg-purple-600/70 cursor-not-allowed"
+                        : "bg-purple-600 hover:bg-purple-500 shadow-md hover:shadow-purple-500/20"
                     }`}
                   >
                     {loadingId === appt._id ? (
@@ -207,9 +220,7 @@ export default function PayForSession() {
                         Processing Payment...
                       </>
                     ) : (
-                      <>
-                        Pay ₹{appt.amount || 499}
-                      </>
+                      <>Pay ₹{appt.amount || 499}</>
                     )}
                   </button>
                 </div>
@@ -227,7 +238,9 @@ function InfoRow({ icon, label, value }) {
     <div className="flex items-start gap-3">
       <div className="mt-0.5 flex-shrink-0">{icon}</div>
       <div>
-        <div className="text-xs uppercase tracking-wider text-zinc-400">{label}</div>
+        <div className="text-xs uppercase tracking-wider text-zinc-400">
+          {label}
+        </div>
         <div className="text-white">{value}</div>
       </div>
     </div>

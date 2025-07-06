@@ -16,7 +16,7 @@ import {
   NotebookPen,
   LogOut,
   Menu,
-  CalendarPlus
+  CalendarPlus,
 } from "lucide-react";
 
 export default function MyAppointments({ userId }) {
@@ -101,7 +101,7 @@ export default function MyAppointments({ userId }) {
           <Menu className="w-5 h-5 dark:text-white" />
         </button>
         <h1 className="text-xl font-bold dark:text-white">My Appointments</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
+        <div className="w-10"></div>
       </header>
 
       {/* Navigation Sidebar - Mobile */}
@@ -112,9 +112,9 @@ export default function MyAppointments({ userId }) {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-            My Appointments
+            Appointments
           </div>
-          
+
           <Link
             to="/dashboard"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -123,7 +123,7 @@ export default function MyAppointments({ userId }) {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+
           <Link
             to="/book"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -132,7 +132,7 @@ export default function MyAppointments({ userId }) {
             <CalendarPlus className="h-5 w-5" />
             <span>Book Appointments</span>
           </Link>
-          
+
           <Link
             to="/login"
             onClick={() => {

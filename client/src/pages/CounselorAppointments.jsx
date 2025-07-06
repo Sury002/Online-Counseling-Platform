@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { API } from "../api";
 import {
   NotebookPen,
-  CalendarDays,
   UserCircle2,
   MessageCircle,
   Video,
   CreditCard,
   LogOut,
   CheckCircle,
-  Menu
+  User,
+  Menu,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -38,19 +38,14 @@ export default function CounselorAppointments({ userId }) {
   const handleMarkCompleted = async (id) => {
     try {
       const res = await API.patch(`/appointments/mark-completed/${id}`);
-      setAppointments((prev) =>
-        prev.map((a) => (a._id === id ? res.data : a))
-      );
+      setAppointments((prev) => prev.map((a) => (a._id === id ? res.data : a)));
     } catch (err) {
       console.error("Error marking appointment as completed");
     }
   };
 
   const isInteractionAllowed = (app) => {
-    return (
-      app.status?.toLowerCase() === "pending" &&
-      app.isPaid === true
-    );
+    return app.status?.toLowerCase() === "pending" && app.isPaid === true;
   };
 
   return (
@@ -63,8 +58,8 @@ export default function CounselorAppointments({ userId }) {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold">Your Appointments</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
+        <h1 className="text-xl font-bold">Appointments</h1>
+        <div className="w-10"></div>
       </header>
 
       {/* Navigation Sidebar - Mobile */}
@@ -74,10 +69,8 @@ export default function CounselorAppointments({ userId }) {
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
         <div className="p-6 h-full flex flex-col">
-          <div className="text-2xl font-bold text-white mb-8">
-            Counselor
-          </div>
-          
+          <div className="text-2xl font-bold text-white mb-8">Appointments</div>
+
           <Link
             to="/dashboard/counselor"
             className="flex items-center gap-3 text-zinc-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -86,7 +79,15 @@ export default function CounselorAppointments({ userId }) {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+          <Link
+            to="/profile/counselor"
+            className="flex items-center gap-3 text-zinc-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <User className="h-5 w-5" />
+            <span>Profile</span>
+          </Link>
+
           <Link
             to="/login"
             onClick={() => {
@@ -114,9 +115,11 @@ export default function CounselorAppointments({ userId }) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-              Your Appointments
+              My Appointments
             </h2>
-            <p className="text-zinc-400">Manage your upcoming and past counseling sessions</p>
+            <p className="text-zinc-400">
+              Manage your upcoming and past counseling sessions
+            </p>
           </div>
 
           {appointments.length === 0 ? (
@@ -161,15 +164,17 @@ export default function CounselorAppointments({ userId }) {
                       <UserCircle2 className="w-10 h-10 text-blue-400" />
                       <div>
                         <h3 className="font-bold">{app.clientId?.name}</h3>
-                        <p className="text-sm text-zinc-300">{app.sessionType}</p>
+                        <p className="text-sm text-zinc-300">
+                          {app.sessionType}
+                        </p>
                         <p className="text-xs text-zinc-500">
-                          {new Date(app.date).toLocaleString('en-IN', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
+                          {new Date(app.date).toLocaleString("en-IN", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </p>
                       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { API } from "../api";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -43,7 +43,6 @@ export default function SessionHistory() {
     API.get(`/appointments/client/${user._id}`)
       .then((res) => {
         const appts = res.data || [];
-        console.log("✅ Client Appointments:", appts);
         setAppointments(appts);
         if (appts.length > 0) {
           setSelectedAppointment(appts[0]);
@@ -62,11 +61,9 @@ export default function SessionHistory() {
     }
 
     setLoading(true);
-    console.log("🔄 Fetching note for:", selectedAppointment._id);
 
     API.get(`/notes/${selectedAppointment._id}`)
       .then((res) => {
-        console.log("📝 Note fetched:", res.data);
         setNote(res.data?.content || null);
       })
       .catch((err) => {
@@ -110,7 +107,7 @@ export default function SessionHistory() {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-            My Account
+            Session Notes
           </div>
 
           <Link
@@ -168,7 +165,7 @@ export default function SessionHistory() {
           </button>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <User className="text-indigo-600 dark:text-indigo-400" />
-            My Sessions
+            My Notes
           </h2>
         </div>
 
@@ -187,7 +184,6 @@ export default function SessionHistory() {
                 <div
                   key={appt._id}
                   onClick={() => {
-                    console.log("🔘 Selected appointment:", appt._id);
                     setSelectedAppointment(appt);
                   }}
                   className={`p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between ${

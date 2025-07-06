@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { API } from '../api';
-import { useNavigate, Link } from 'react-router-dom';
-import { 
+import { useEffect, useState } from "react";
+import { API } from "../api";
+import { useNavigate, Link } from "react-router-dom";
+import {
   Video,
   PhoneCall,
   Lock,
@@ -14,11 +14,11 @@ import {
   CalendarDays,
   LogOut,
   Menu,
-  ChevronLeft
-} from 'lucide-react';
+  ChevronLeft,
+} from "lucide-react";
 
 export default function CallInterface() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const senderId = user?._id;
   const [appointments, setAppointments] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -26,7 +26,6 @@ export default function CallInterface() {
   const [showAppointments, setShowAppointments] = useState(true);
   const navigate = useNavigate();
 
-  // Close sidebars when a selection is made on mobile
   useEffect(() => {
     if (selected && window.innerWidth < 768) {
       setShowSidebar(false);
@@ -37,8 +36,8 @@ export default function CallInterface() {
   useEffect(() => {
     if (!senderId) return;
     API.get(`/appointments/my/${senderId}`)
-      .then(res => setAppointments(res.data))
-      .catch(err => console.error('❌ Failed to load appointments:', err));
+      .then((res) => setAppointments(res.data))
+      .catch((err) => console.error("❌ Failed to load appointments:", err));
   }, [senderId]);
 
   const joinCall = () => {
@@ -64,7 +63,7 @@ export default function CallInterface() {
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">
-          {selected ? selected.counselorId?.name : "Video Call"}
+          {selected ? selected.counselorId?.name : "Video Sessions"}
         </h1>
         <button
           onClick={() => setShowAppointments(!showAppointments)}
@@ -82,9 +81,9 @@ export default function CallInterface() {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-            My Sessions
+            Video Sessions
           </div>
-          
+
           <Link
             to="/dashboard"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -93,7 +92,7 @@ export default function CallInterface() {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+
           <Link
             to="/appointments"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -102,7 +101,7 @@ export default function CallInterface() {
             <CalendarDays className="h-5 w-5" />
             <span>Appointments</span>
           </Link>
-          
+
           <Link
             to="/login"
             onClick={() => {
@@ -140,7 +139,7 @@ export default function CallInterface() {
           </button>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Video className="text-indigo-600 dark:text-indigo-400" />
-            Video Sessions
+            My Calls
           </h2>
         </div>
 
@@ -151,14 +150,14 @@ export default function CallInterface() {
             </div>
           ) : (
             <div className="space-y-2">
-              {appointments.map(appt => (
+              {appointments.map((appt) => (
                 <div
                   key={appt._id}
                   onClick={() => setSelected(appt)}
                   className={`p-3 rounded-lg cursor-pointer transition-colors flex items-center justify-between ${
                     selected?._id === appt._id
-                      ? 'bg-indigo-50 dark:bg-gray-700'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                      ? "bg-indigo-50 dark:bg-gray-700"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-700/50"
                   }`}
                 >
                   <div>
@@ -166,16 +165,16 @@ export default function CallInterface() {
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <Calendar className="w-3 h-3" />
                       <span>
-                        {new Date(appt.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
+                        {new Date(appt.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      {appt.status === 'completed' && (
+                      {appt.status === "completed" && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
                           <Check className="w-3 h-3" />
                           Completed
@@ -271,7 +270,8 @@ export default function CallInterface() {
               Session locked
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Complete payment to unlock your video session with {selected.counselorId?.name}
+              Complete payment to unlock your video session with{" "}
+              {selected.counselorId?.name}
             </p>
             <button
               onClick={handlePayment}

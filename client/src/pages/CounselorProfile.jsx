@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   NotebookPen,
-  CalendarDays,
   User,
   LogOut,
-  Mail,
-  ShieldCheck,
   Lock,
   Eye,
   EyeOff,
   CheckCircle,
+  CalendarDays,
   XCircle,
-  Menu
-} from 'lucide-react';
-import { API } from '../api';
+  Menu,
+} from "lucide-react";
+import { API } from "../api";
 
 export default function CounselorProfile() {
-  const storedUser = JSON.parse(localStorage.getItem('user'));
+  const storedUser = JSON.parse(localStorage.getItem("user"));
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
-  const [msg, setMsg] = useState({ text: '', type: '' });
+  const [msg, setMsg] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
@@ -44,12 +42,12 @@ export default function CounselorProfile() {
           email: res.data.email,
         }))
       )
-      .catch(() => showMessage('Failed to fetch profile info', 'error'));
+      .catch(() => showMessage("Failed to fetch profile info", "error"));
   }, [storedUser._id]);
 
   const showMessage = (text, type) => {
     setMsg({ text, type });
-    setTimeout(() => setMsg({ text: '', type: '' }), 5000);
+    setTimeout(() => setMsg({ text: "", type: "" }), 5000);
   };
 
   const handleChange = (e) => {
@@ -67,18 +65,18 @@ export default function CounselorProfile() {
         name: form.name,
         email: form.email,
       });
-      localStorage.setItem('user', JSON.stringify(res.data));
-      showMessage('Profile updated successfully!', 'success');
+      localStorage.setItem("user", JSON.stringify(res.data));
+      showMessage("Profile updated successfully!", "success");
       setIsEditing(false);
     } catch {
-      showMessage('Failed to update profile', 'error');
+      showMessage("Failed to update profile", "error");
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (form.newPassword !== form.confirmPassword) {
-      showMessage('New passwords do not match', 'error');
+      showMessage("New passwords do not match", "error");
       return;
     }
 
@@ -87,16 +85,16 @@ export default function CounselorProfile() {
         currentPassword: form.currentPassword,
         newPassword: form.newPassword,
       });
-      showMessage('Password changed successfully!', 'success');
+      showMessage("Password changed successfully!", "success");
       setIsPasswordEditing(false);
       setForm((prev) => ({
         ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       }));
     } catch {
-      showMessage('Failed to change password', 'error');
+      showMessage("Failed to change password", "error");
     }
   };
 
@@ -110,8 +108,8 @@ export default function CounselorProfile() {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold">Counselor Profile</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
+        <h1 className="text-xl font-bold">My Profile</h1>
+        <div className="w-10"></div>
       </header>
 
       {/* Navigation Sidebar - Mobile */}
@@ -122,10 +120,9 @@ export default function CounselorProfile() {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="text-2xl font-bold text-white mb-8 flex items-center gap-2">
-            <NotebookPen className="text-blue-400" />
-            Counselor Hub
+            Profile
           </div>
-          
+
           <Link
             to="/dashboard/counselor"
             className="flex items-center gap-3 text-zinc-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -134,7 +131,15 @@ export default function CounselorProfile() {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+          <Link
+            to="/appointments/counselor"
+            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            onClick={() => setShowSidebar(false)}
+          >
+            <CalendarDays className="h-5 w-5" />
+            <span>Appointments</span>
+          </Link>
+
           <Link
             to="/login"
             onClick={() => {
@@ -162,18 +167,26 @@ export default function CounselorProfile() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-              Counselor Profile
+              Profile Settings
             </h2>
-            <p className="text-zinc-400">Manage your account information and security settings</p>
+            <p className="text-zinc-400">
+              Manage your account information and security settings
+            </p>
           </div>
 
           {msg.text && (
-            <div className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in ${
-              msg.type === 'success' 
-                ? 'bg-emerald-600/80 text-white' 
-                : 'bg-red-600/80 text-white'
-            }`}>
-              {msg.type === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
+            <div
+              className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in ${
+                msg.type === "success"
+                  ? "bg-emerald-600/80 text-white"
+                  : "bg-red-600/80 text-white"
+              }`}
+            >
+              {msg.type === "success" ? (
+                <CheckCircle size={18} />
+              ) : (
+                <XCircle size={18} />
+              )}
               <span>{msg.text}</span>
             </div>
           )}
@@ -187,14 +200,14 @@ export default function CounselorProfile() {
                   Profile Information
                 </h3>
                 {!isEditing ? (
-                  <button 
+                  <button
                     onClick={() => setIsEditing(true)}
                     className="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-md"
                   >
                     Edit
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => setIsEditing(false)}
                     className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
                   >
@@ -205,10 +218,21 @@ export default function CounselorProfile() {
 
               {isEditing ? (
                 <form onSubmit={handleProfileSubmit} className="space-y-4">
-                  <TextField label="Full Name" name="name" value={form.name} onChange={handleChange} />
-                  <TextField label="Email" name="email" type="email" value={form.email} onChange={handleChange} />
-                  <button 
-                    type="submit" 
+                  <TextField
+                    label="Full Name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium"
                   >
                     Save Changes
@@ -221,7 +245,11 @@ export default function CounselorProfile() {
                   <InfoRow label="Role" value={storedUser.role} />
                   <InfoRow
                     label="Member Since"
-                    value={storedUser.createdAt ? new Date(storedUser.createdAt).toLocaleDateString() : 'N/A'}
+                    value={
+                      storedUser.createdAt
+                        ? new Date(storedUser.createdAt).toLocaleDateString()
+                        : "N/A"
+                    }
                   />
                 </div>
               )}
@@ -235,14 +263,14 @@ export default function CounselorProfile() {
                   Password Settings
                 </h3>
                 {!isPasswordEditing ? (
-                  <button 
+                  <button
                     onClick={() => setIsPasswordEditing(true)}
                     className="text-sm bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded-md"
                   >
                     Change
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => setIsPasswordEditing(false)}
                     className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
                   >
@@ -259,7 +287,7 @@ export default function CounselorProfile() {
                     value={form.currentPassword}
                     onChange={handleChange}
                     visible={showPassword.current}
-                    toggle={() => togglePasswordVisibility('current')}
+                    toggle={() => togglePasswordVisibility("current")}
                   />
                   <PasswordField
                     label="New Password"
@@ -267,7 +295,7 @@ export default function CounselorProfile() {
                     value={form.newPassword}
                     onChange={handleChange}
                     visible={showPassword.new}
-                    toggle={() => togglePasswordVisibility('new')}
+                    toggle={() => togglePasswordVisibility("new")}
                   />
                   <PasswordField
                     label="Confirm Password"
@@ -275,10 +303,10 @@ export default function CounselorProfile() {
                     value={form.confirmPassword}
                     onChange={handleChange}
                     visible={showPassword.confirm}
-                    toggle={() => togglePasswordVisibility('confirm')}
+                    toggle={() => togglePasswordVisibility("confirm")}
                   />
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-full bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-medium"
                   >
                     Change Password
@@ -287,8 +315,12 @@ export default function CounselorProfile() {
               ) : (
                 <div className="text-center py-6">
                   <Lock size={40} className="mx-auto text-zinc-600 mb-4" />
-                  <p className="text-zinc-400">Password management is disabled</p>
-                  <p className="text-sm text-zinc-500 mt-2">Click "Change" to update your password</p>
+                  <p className="text-zinc-400">
+                    Password management is disabled
+                  </p>
+                  <p className="text-sm text-zinc-500 mt-2">
+                    Click "Change" to update your password
+                  </p>
                 </div>
               )}
             </div>
@@ -308,7 +340,7 @@ function InfoRow({ label, value }) {
   );
 }
 
-function TextField({ label, name, value, onChange, type = 'text' }) {
+function TextField({ label, name, value, onChange, type = "text" }) {
   return (
     <div className="space-y-1">
       <label className="block text-sm text-zinc-400">{label}</label>
@@ -330,7 +362,7 @@ function PasswordField({ label, name, value, onChange, visible, toggle }) {
       <label className="block text-sm text-zinc-400">{label}</label>
       <div className="relative">
         <input
-          type={visible ? 'text' : 'password'}
+          type={visible ? "text" : "password"}
           name={name}
           value={value}
           onChange={onChange}

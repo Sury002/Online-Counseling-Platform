@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { API } from "../api";
 import {
@@ -9,15 +9,13 @@ import {
   User,
   LogOut,
   BrainCircuit,
-  BookOpen,
-  NotebookPen,
   FileText,
   Menu,
   X,
   CreditCard,
   HeartPulse,
   Shield,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import heroImg from "../assets/dashboard-hero.jpg.jpg";
 
@@ -34,44 +32,45 @@ export default function CounselorDashboard({ userId }) {
         const res = await API.get(`/appointments/my/${userId}`);
         const data = res.data || [];
         setAppointments(data);
-        
-        // Count paid appointments
-        const paid = data.filter(a => a.isPaid);
+
+        const paid = data.filter((a) => a.isPaid);
         setPaidClients(paid.length);
-        
+
         setIsLoading(false);
       } catch (err) {
         console.error("Failed to load appointment stats");
         setIsLoading(false);
       }
     };
-    
+
     if (userId) fetchStats();
   }, [userId]);
 
-  const upcoming = appointments.filter(a => new Date(a.date) > new Date());
+  const upcoming = appointments.filter((a) => new Date(a.date) > new Date());
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950">
       {/* Mobile Sidebar Toggle */}
       <div className="md:hidden fixed top-4 right-4 z-50">
-        <button 
+        <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-lg"
         >
-          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {sidebarOpen ? (
+            <X className="w-6 h-6 text-white" />
+          ) : (
+            <Menu className="w-6 h-6 text-white" />
+          )}
         </button>
       </div>
 
-      {/* Enhanced Sidebar */}
-      <aside 
+      <aside
         className={`fixed inset-y-0 left-0 w-72 bg-white/95 dark:bg-zinc-800/95 backdrop-blur-lg z-40 shadow-2xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:w-72 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full px-6 py-10">
           <div>
-            {/* Updated Logo */}
             <div className="flex items-center gap-3 mb-12">
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-xl">
                 <BrainCircuit className="w-6 h-6 text-white" />
@@ -80,44 +79,42 @@ export default function CounselorDashboard({ userId }) {
                 Counselor Hub
               </h2>
             </div>
-            
-            {/* Navigation with larger spacing */}
+
             <div className="space-y-3">
-                <NavItem 
-                icon={<CalendarCheck size={20} className="text-purple-500" />} 
-                label="Appointments" 
-                to="/appointments/counselor" 
+              <NavItem
+                icon={<CalendarCheck size={20} className="text-purple-500" />}
+                label="Appointments"
+                to="/appointments/counselor"
               />
-              <NavItem 
-                icon={<MessageSquare size={20} className="text-emerald-500" />} 
-                label="Messages" 
-                to="/chat/counselor" 
+              <NavItem
+                icon={<MessageSquare size={20} className="text-emerald-500" />}
+                label="Messages"
+                to="/chat/counselor"
               />
-              <NavItem 
-                icon={<Video size={20} className="text-rose-500" />} 
-                label="Video Calls" 
-                to="/call/counselor" 
+              <NavItem
+                icon={<Video size={20} className="text-rose-500" />}
+                label="Video Calls"
+                to="/call/counselor"
               />
-              <NavItem 
-                icon={<FileText size={20} className="text-amber-500" />} 
-                label="Session Notes" 
-                to="/notes/counselor" 
+              <NavItem
+                icon={<FileText size={20} className="text-amber-500" />}
+                label="Session Notes"
+                to="/notes/counselor"
               />
-              <NavItem 
-                icon={<User size={20} className="text-blue-500" />} 
-                label="Profile" 
-                to="/profile/counselor" 
+              <NavItem
+                icon={<User size={20} className="text-blue-500" />}
+                label="Profile"
+                to="/profile/counselor"
               />
             </div>
           </div>
-          
-          {/* Logout button at bottom */}
+
           <div className="mt-auto pt-10">
-            <NavItem 
-              icon={<LogOut size={20} className="text-rose-500" />} 
-              label="Logout" 
-              to="/login" 
-              onClick={() => localStorage.clear()} 
+            <NavItem
+              icon={<LogOut size={20} className="text-rose-500" />}
+              label="Logout"
+              to="/login"
+              onClick={() => localStorage.clear()}
             />
           </div>
         </div>
@@ -137,7 +134,8 @@ export default function CounselorDashboard({ userId }) {
               Welcome, Counselor <span className="text-indigo-300">👋</span>
             </h1>
             <p className="text-zinc-200 text-sm sm:text-base max-w-xl">
-              Manage your counseling sessions and track your professional activities.
+              Manage your counseling sessions and track your professional
+              activities.
             </p>
             <Link
               to="/appointments/counselor"
@@ -150,23 +148,23 @@ export default function CounselorDashboard({ userId }) {
 
         {/* Stats Overview */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-8">
-          <OverviewCard 
-            label="Total Appointments" 
-            value={appointments.length} 
+          <OverviewCard
+            label="Total Appointments"
+            value={appointments.length}
             icon={<CalendarCheck className="w-5 h-5" />}
             color="bg-gradient-to-br from-indigo-600 to-indigo-700"
             loading={isLoading}
           />
-          <OverviewCard 
-            label="Upcoming" 
-            value={upcoming.length} 
+          <OverviewCard
+            label="Upcoming"
+            value={upcoming.length}
             icon={<CalendarPlus className="w-5 h-5" />}
             color="bg-gradient-to-br from-emerald-600 to-emerald-700"
             loading={isLoading}
           />
-          <OverviewCard 
-            label="Paid Sessions" 
-            value={paidClients} 
+          <OverviewCard
+            label="Paid Sessions"
+            value={paidClients}
             icon={<CreditCard className="w-5 h-5" />}
             color="bg-gradient-to-br from-amber-600 to-amber-700"
             loading={isLoading}
@@ -184,11 +182,14 @@ export default function CounselorDashboard({ userId }) {
                 <HeartPulse className="w-6 h-6 text-indigo-600 dark:text-indigo-300" />
               </div>
               <div>
-                <h3 className="font-bold text-zinc-800 dark:text-white mb-2">Holistic Wellbeing</h3>
+                <h3 className="font-bold text-zinc-800 dark:text-white mb-2">
+                  Holistic Wellbeing
+                </h3>
                 <p className="text-zinc-600 dark:text-zinc-300">
-                  Mental health is deeply connected to physical health, social connections, 
-                  and emotional resilience. Encourage clients to consider all aspects of 
-                  their wellbeing in their healing journey.
+                  Mental health is deeply connected to physical health, social
+                  connections, and emotional resilience. Encourage clients to
+                  consider all aspects of their wellbeing in their healing
+                  journey.
                 </p>
               </div>
             </div>
@@ -197,11 +198,14 @@ export default function CounselorDashboard({ userId }) {
                 <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
               </div>
               <div>
-                <h3 className="font-bold text-zinc-800 dark:text-white mb-2">Resilience Building</h3>
+                <h3 className="font-bold text-zinc-800 dark:text-white mb-2">
+                  Resilience Building
+                </h3>
                 <p className="text-zinc-600 dark:text-zinc-300">
-                  Developing coping strategies and emotional regulation skills can 
-                  significantly improve clients' ability to handle life's challenges. 
-                  Focus on strengths-based approaches in your sessions.
+                  Developing coping strategies and emotional regulation skills
+                  can significantly improve clients' ability to handle life's
+                  challenges. Focus on strengths-based approaches in your
+                  sessions.
                 </p>
               </div>
             </div>
@@ -220,19 +224,29 @@ export default function CounselorDashboard({ userId }) {
               </h3>
               <ul className="mt-3 space-y-3 text-sm text-zinc-700 dark:text-zinc-300">
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">•</span>
-                  <span>Increased use of teletherapy and digital mental health tools</span>
+                  <span className="text-purple-500 dark:text-purple-400">
+                    •
+                  </span>
+                  <span>
+                    Increased use of teletherapy and digital mental health tools
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">•</span>
+                  <span className="text-purple-500 dark:text-purple-400">
+                    •
+                  </span>
                   <span>Growing emphasis on culturally competent care</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">•</span>
+                  <span className="text-purple-500 dark:text-purple-400">
+                    •
+                  </span>
                   <span>Integration of mindfulness and somatic approaches</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">•</span>
+                  <span className="text-purple-500 dark:text-purple-400">
+                    •
+                  </span>
                   <span>Focus on preventative mental health care</span>
                 </li>
               </ul>
@@ -253,13 +267,13 @@ function NavItem({ icon, label, to, onClick, disabled }) {
         else {
           onClick?.();
           if (window.innerWidth < 768) {
-            document.querySelector('aside')?.classList.add('-translate-x-full');
+            document.querySelector("aside")?.classList.add("-translate-x-full");
           }
         }
       }}
       className={`flex items-center gap-4 py-4 px-4 rounded-xl text-base font-medium transition-all ${
-        disabled 
-          ? "text-zinc-400 dark:text-zinc-500 cursor-not-allowed" 
+        disabled
+          ? "text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
           : "text-zinc-700 dark:text-zinc-200 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400"
       }`}
     >
@@ -271,14 +285,14 @@ function NavItem({ icon, label, to, onClick, disabled }) {
 
 function OverviewCard({ label, value, icon, color, loading }) {
   return (
-    <div className={`${color} p-4 sm:p-5 rounded-2xl shadow-md text-white relative overflow-hidden`}>
+    <div
+      className={`${color} p-4 sm:p-5 rounded-2xl shadow-md text-white relative overflow-hidden`}
+    >
       <div className="absolute -right-4 -bottom-4 opacity-20 w-20 h-20 rounded-full bg-white"></div>
       <div className="relative z-10">
         <div className="flex justify-between items-start">
           <h3 className="text-sm font-medium">{label}</h3>
-          <div className="p-2 bg-white/20 rounded-lg">
-            {icon}
-          </div>
+          <div className="p-2 bg-white/20 rounded-lg">{icon}</div>
         </div>
         {loading ? (
           <div className="h-8 w-3/4 bg-white/20 rounded-lg animate-pulse mt-3"></div>

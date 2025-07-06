@@ -55,7 +55,7 @@ export default function VideoCall() {
     videoMuted: false,
     audioMuted: false,
     uid: null,
-    left: false
+    left: false,
   });
 
   // Format call duration
@@ -96,9 +96,10 @@ export default function VideoCall() {
 
   useEffect(() => {
     // Trigger browser permission prompt (safe fallback)
-    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-      .then(stream => {
-        stream.getTracks().forEach(track => track.stop());
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((stream) => {
+        stream.getTracks().forEach((track) => track.stop());
       })
       .catch((err) => {
         console.warn("Mic/Cam permission denied or missing:", err.message);
@@ -113,7 +114,8 @@ export default function VideoCall() {
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     rtcClientRef.current = client;
 
-    const isCounselor = user._id.toString() === appointment.counselorId._id.toString();
+    const isCounselor =
+      user._id.toString() === appointment.counselorId._id.toString();
 
     // Simulate connection quality
     const qualityInterval = setInterval(() => {
@@ -129,9 +131,15 @@ export default function VideoCall() {
       try {
         const stats = await client.getRTCStats();
         setNetworkStats({
-          uplink: stats.TxBitrate ? `${Math.round(stats.TxBitrate / 1024)} Mbps` : 'N/A',
-          downlink: stats.RxBitrate ? `${Math.round(stats.RxBitrate / 1024)} Mbps` : 'N/A',
-          packetLoss: stats.RxPacketLossRate ? `${Math.round(stats.RxPacketLossRate * 100)}%` : '0%'
+          uplink: stats.TxBitrate
+            ? `${Math.round(stats.TxBitrate / 1024)} Mbps`
+            : "N/A",
+          downlink: stats.RxBitrate
+            ? `${Math.round(stats.RxBitrate / 1024)} Mbps`
+            : "N/A",
+          packetLoss: stats.RxPacketLossRate
+            ? `${Math.round(stats.RxPacketLossRate * 100)}%`
+            : "0%",
         });
       } catch (err) {
         console.error("Failed to get network stats:", err);
@@ -147,10 +155,6 @@ export default function VideoCall() {
         const generatedToken = data.token;
         setToken(generatedToken);
 
-        console.log("📡 Channel:", appointmentId);
-        console.log("🆔 UID:", uid);
-        console.log("🔑 Token:", generatedToken);
-
         await client.join(APP_ID, appointmentId, generatedToken, uid);
         setCallStatus("connected");
 
@@ -158,64 +162,60 @@ export default function VideoCall() {
         statsIntervalRef.current = setInterval(monitorNetworkStats, 5000);
 
         client.on("user-joined", (remoteUser) => {
-          console.log("✅ Remote user joined channel:", remoteUser.uid);
           remoteUserRef.current = remoteUser;
-          setRemoteUserState(prev => ({
+          setRemoteUserState((prev) => ({
             ...prev,
             joined: true,
             uid: remoteUser.uid,
-            left: false
+            left: false,
           }));
         });
 
         client.on("user-published", async (remoteUser, mediaType) => {
-          console.log("👥 Remote user published:", remoteUser.uid, mediaType);
           await client.subscribe(remoteUser, mediaType);
 
           if (mediaType === "video") {
             remoteUser.videoTrack.play(remoteVideoRef.current);
-            setRemoteUserState(prev => ({
+            setRemoteUserState((prev) => ({
               ...prev,
               videoPublished: true,
-              videoMuted: false
+              videoMuted: false,
             }));
           }
 
           if (mediaType === "audio") {
             remoteUser.audioTrack.play();
-            setRemoteUserState(prev => ({
+            setRemoteUserState((prev) => ({
               ...prev,
               audioPublished: true,
-              audioMuted: false
+              audioMuted: false,
             }));
           }
         });
 
         client.on("user-unpublished", (remoteUser, mediaType) => {
-          console.log("👤 Remote user unpublished:", remoteUser.uid, mediaType);
           if (mediaType === "video") {
-            setRemoteUserState(prev => ({
+            setRemoteUserState((prev) => ({
               ...prev,
               videoPublished: false,
-              videoMuted: true
+              videoMuted: true,
             }));
           }
           if (mediaType === "audio") {
-            setRemoteUserState(prev => ({
+            setRemoteUserState((prev) => ({
               ...prev,
               audioPublished: false,
-              audioMuted: true
+              audioMuted: true,
             }));
           }
         });
 
         client.on("user-left", (remoteUser) => {
-          console.log("❌ Remote user left:", remoteUser.uid);
-          setRemoteUserState(prev => ({
+          setRemoteUserState((prev) => ({
             ...prev,
             joined: false,
             left: true,
-            uid: remoteUser.uid
+            uid: remoteUser.uid,
           }));
         });
 
@@ -230,7 +230,8 @@ export default function VideoCall() {
             return;
           }
 
-          const [micTrack, camTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
+          const [micTrack, camTrack] =
+            await AgoraRTC.createMicrophoneAndCameraTracks();
           localAudioTrackRef.current = micTrack;
           localVideoTrackRef.current = camTrack;
 
@@ -365,9 +366,7 @@ export default function VideoCall() {
               {otherParticipant.name}'s camera is off
             </p>
             {remoteUserState.audioPublished && (
-              <p className="text-sm text-gray-400 mt-1">
-                Audio is available
-              </p>
+              <p className="text-sm text-gray-400 mt-1">Audio is available</p>
             )}
           </div>
         </div>
@@ -383,10 +382,15 @@ export default function VideoCall() {
       <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex flex-col border-b border-gray-700/50 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className={`p-2 rounded-lg shadow-lg ${
-              callStatus === "connected" ? "bg-green-600" : 
-              callStatus === "failed" ? "bg-red-600" : "bg-blue-600"
-            }`}>
+            <div
+              className={`p-2 rounded-lg shadow-lg ${
+                callStatus === "connected"
+                  ? "bg-green-600"
+                  : callStatus === "failed"
+                  ? "bg-red-600"
+                  : "bg-blue-600"
+              }`}
+            >
               {callStatus === "connected" ? (
                 <CheckCircleIcon className="h-6 w-6" />
               ) : callStatus === "failed" ? (
@@ -507,11 +511,13 @@ export default function VideoCall() {
         <div
           ref={remoteVideoRef}
           className={`absolute inset-0 bg-gray-800 transition-opacity duration-300 ${
-            remoteUserState.joined && remoteUserState.videoPublished ? "opacity-100" : "opacity-90"
+            remoteUserState.joined && remoteUserState.videoPublished
+              ? "opacity-100"
+              : "opacity-90"
           }`}
         >
           {renderRemoteUserStatus()}
-          
+
           {/* Status overlay */}
           <div className="absolute top-4 left-4 flex items-center space-x-2">
             <span className="text-sm bg-gray-900/80 px-3 py-1.5 rounded-full text-white flex items-center shadow">
@@ -536,16 +542,16 @@ export default function VideoCall() {
             <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
               <div className="text-center p-4">
                 <VideoCameraSlashIcon className="h-6 w-6 text-gray-500 mx-auto mb-1 md:h-8 md:w-8 md:mb-2" />
-                <p className="text-gray-400 text-xs md:text-sm">Your camera is off</p>
+                <p className="text-gray-400 text-xs md:text-sm">
+                  Your camera is off
+                </p>
               </div>
             </div>
           )}
           <span className="absolute top-2 left-2 text-xs bg-gray-900/80 px-2 py-1 rounded-full text-white flex items-center">
             <UserIcon className="h-2.5 w-2.5 mr-1" />
             <span>You</span>
-            {!micEnabled && (
-              <NoSymbolIcon className="h-2.5 w-2.5 ml-1" />
-            )}
+            {!micEnabled && <NoSymbolIcon className="h-2.5 w-2.5 ml-1" />}
           </span>
         </div>
       </div>

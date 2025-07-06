@@ -16,19 +16,13 @@ router.get('/generate-token', (req, res) => {
     return res.status(400).json({ msg: 'Channel and UID are required' });
   }
 
-  // Logging for debugging
-  console.log("✅ Token generation request received:");
-  console.log("➡ Channel:", channel);
-  console.log("➡ UID:", uid);
-  console.log("➡ App ID:", APP_ID);
-  console.log("➡ App Cert:", APP_CERT);
 
   const role = RtcRole.PUBLISHER;
   const expireTime = 3600;
   const currentTime = Math.floor(Date.now() / 1000);
   const privilegeExpireTime = currentTime + expireTime;
 
-  // Use buildTokenWithAccount if UID is a string (like MongoDB _id)
+ 
   const token = RtcTokenBuilder.buildTokenWithAccount(
     APP_ID,
     APP_CERT,
@@ -38,7 +32,7 @@ router.get('/generate-token', (req, res) => {
     privilegeExpireTime
   );
 
-  console.log("✅ Token successfully generated!");
+
   res.json({ token });
 });
 

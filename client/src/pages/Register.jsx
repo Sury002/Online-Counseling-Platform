@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { API } from '../api';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { API } from "../api";
+import { Link } from "react-router-dom";
 
 export default function Register() {
-  const [form, setForm] = useState({ 
-    name: '', 
-    email: '', 
-    password: '', 
-    role: 'client' 
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "client",
   });
-  const [msg, setMsg] = useState('');
+  const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,12 +20,12 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
     try {
-      const res = await API.post('/auth/register', form);
+      const res = await API.post("/auth/register", form);
       setMsg(res.data.msg);
     } catch (err) {
-      setError(err.response?.data?.msg || 'Registration failed');
+      setError(err.response?.data?.msg || "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +112,7 @@ export default function Register() {
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition duration-200 ${
-              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
             {isLoading ? (
@@ -140,14 +140,14 @@ export default function Register() {
                 Creating Account...
               </span>
             ) : (
-              'Register'
+              "Register"
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link
               to="/login"
               className="font-medium text-blue-600 hover:text-blue-800 hover:underline"

@@ -137,7 +137,7 @@ function App() {
           }
         />
 
-        {/* Chat (Base first, then dynamic to avoid redirect) */}
+        {/* Chat */}
         <Route
           path="/chat"
           element={

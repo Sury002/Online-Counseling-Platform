@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { API } from '../api';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { API } from "../api";
+import { Link } from "react-router-dom";
 import {
   UserCircle2,
   Mail,
@@ -13,21 +13,22 @@ import {
   CalendarDays,
   LogOut,
   Menu,
-  ChevronLeft
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function Profile() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
-  const [msg, setMsg] = useState({ text: '', type: '' });
+  const [msg, setMsg] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState({
-    current: false, new: false, confirm: false
+    current: false,
+    new: false,
+    confirm: false,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordEditing, setIsPasswordEditing] = useState(false);
@@ -36,25 +37,27 @@ export default function Profile() {
   useEffect(() => {
     if (!user?._id) return;
     API.get(`/users/${user._id}`)
-      .then(res => setForm(prev => ({
-        ...prev,
-        name: res.data.name,
-        email: res.data.email
-      })))
-      .catch(() => showMessage('Failed to fetch profile info', 'error'));
+      .then((res) =>
+        setForm((prev) => ({
+          ...prev,
+          name: res.data.name,
+          email: res.data.email,
+        }))
+      )
+      .catch(() => showMessage("Failed to fetch profile info", "error"));
   }, [user?._id]);
 
   const showMessage = (text, type) => {
     setMsg({ text, type });
-    setTimeout(() => setMsg({ text: '', type: '' }), 5000);
+    setTimeout(() => setMsg({ text: "", type: "" }), 5000);
   };
 
   const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const togglePasswordVisibility = (field) => {
-    setShowPassword(prev => ({ ...prev, [field]: !prev[field] }));
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   const handleProfileSubmit = async (e) => {
@@ -62,42 +65,43 @@ export default function Profile() {
     try {
       const res = await API.put(`/users/${user._id}`, {
         name: form.name,
-        email: form.email
+        email: form.email,
       });
-      localStorage.setItem('user', JSON.stringify(res.data));
-      showMessage('Profile updated successfully!', 'success');
+      localStorage.setItem("user", JSON.stringify(res.data));
+      showMessage("Profile updated successfully!", "success");
       setIsEditing(false);
     } catch {
-      showMessage('Failed to update profile', 'error');
+      showMessage("Failed to update profile", "error");
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (form.newPassword !== form.confirmPassword) {
-      showMessage('New passwords do not match', 'error');
+      showMessage("New passwords do not match", "error");
       return;
     }
 
     try {
       await API.put(`/users/change-password/${user._id}`, {
         currentPassword: form.currentPassword,
-        newPassword: form.newPassword
+        newPassword: form.newPassword,
       });
-      showMessage('Password changed successfully!', 'success');
+      showMessage("Password changed successfully!", "success");
       setIsPasswordEditing(false);
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       }));
     } catch {
-      showMessage('Failed to change password', 'error');
+      showMessage("Failed to change password", "error");
     }
   };
 
-  if (!user?._id) return <div className="text-center mt-20 text-white">Invalid user</div>;
+  if (!user?._id)
+    return <div className="text-center mt-20 text-white">Invalid user</div>;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-zinc-900 to-zinc-800 text-white">
@@ -110,7 +114,7 @@ export default function Profile() {
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">My Profile</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
+        <div className="w-10"></div>
       </header>
 
       {/* Navigation Sidebar - Mobile */}
@@ -120,10 +124,8 @@ export default function Profile() {
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
         <div className="p-6 h-full flex flex-col">
-          <div className="text-2xl font-bold text-white mb-8">
-           My Profile
-          </div>
-          
+          <div className="text-2xl font-bold text-white mb-8">Profile</div>
+
           <Link
             to="/dashboard"
             className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
@@ -132,7 +134,7 @@ export default function Profile() {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+
           <Link
             to="/appointments"
             className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
@@ -141,7 +143,7 @@ export default function Profile() {
             <CalendarDays className="h-5 w-5" />
             <span>Appointments</span>
           </Link>
-          
+
           <Link
             to="/login"
             onClick={() => {
@@ -171,16 +173,24 @@ export default function Profile() {
             <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">
               Profile Settings
             </h2>
-            <p className="text-zinc-400">Manage your account information and security</p>
+            <p className="text-zinc-400">
+              Manage your account information and security
+            </p>
           </div>
 
           {msg.text && (
-            <div className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in ${
-              msg.type === 'success' 
-                ? 'bg-emerald-600/80 text-white' 
-                : 'bg-red-600/80 text-white'
-            }`}>
-              {msg.type === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
+            <div
+              className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in ${
+                msg.type === "success"
+                  ? "bg-emerald-600/80 text-white"
+                  : "bg-red-600/80 text-white"
+              }`}
+            >
+              {msg.type === "success" ? (
+                <CheckCircle size={18} />
+              ) : (
+                <XCircle size={18} />
+              )}
               <span>{msg.text}</span>
             </div>
           )}
@@ -194,14 +204,14 @@ export default function Profile() {
                   Profile Information
                 </h3>
                 {!isEditing ? (
-                  <button 
+                  <button
                     onClick={() => setIsEditing(true)}
                     className="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-md"
                   >
                     Edit
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => setIsEditing(false)}
                     className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
                   >
@@ -234,8 +244,8 @@ export default function Profile() {
                       required
                     />
                   </div>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium mt-4"
                   >
                     Save Changes
@@ -243,12 +253,12 @@ export default function Profile() {
                 </form>
               ) : (
                 <div className="space-y-4">
-                  <InfoRow 
+                  <InfoRow
                     icon={<UserCircle2 size={18} className="text-blue-400" />}
                     label="Name"
                     value={form.name}
                   />
-                  <InfoRow 
+                  <InfoRow
                     icon={<Mail size={18} className="text-purple-400" />}
                     label="Email"
                     value={form.email}
@@ -265,14 +275,14 @@ export default function Profile() {
                   Password Settings
                 </h3>
                 {!isPasswordEditing ? (
-                  <button 
+                  <button
                     onClick={() => setIsPasswordEditing(true)}
                     className="text-sm bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded-md"
                   >
                     Change
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => setIsPasswordEditing(false)}
                     className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
                   >
@@ -284,10 +294,12 @@ export default function Profile() {
               {isPasswordEditing ? (
                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">Current Password</label>
+                    <label className="block text-sm text-zinc-400">
+                      Current Password
+                    </label>
                     <div className="relative">
                       <input
-                        type={showPassword.current ? 'text' : 'password'}
+                        type={showPassword.current ? "text" : "password"}
                         name="currentPassword"
                         value={form.currentPassword}
                         onChange={handleChange}
@@ -296,18 +308,24 @@ export default function Profile() {
                       />
                       <button
                         type="button"
-                        onClick={() => togglePasswordVisibility('current')}
+                        onClick={() => togglePasswordVisibility("current")}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
                       >
-                        {showPassword.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword.current ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">New Password</label>
+                    <label className="block text-sm text-zinc-400">
+                      New Password
+                    </label>
                     <div className="relative">
                       <input
-                        type={showPassword.new ? 'text' : 'password'}
+                        type={showPassword.new ? "text" : "password"}
                         name="newPassword"
                         value={form.newPassword}
                         onChange={handleChange}
@@ -317,18 +335,24 @@ export default function Profile() {
                       />
                       <button
                         type="button"
-                        onClick={() => togglePasswordVisibility('new')}
+                        onClick={() => togglePasswordVisibility("new")}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
                       >
-                        {showPassword.new ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword.new ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">Confirm Password</label>
+                    <label className="block text-sm text-zinc-400">
+                      Confirm Password
+                    </label>
                     <div className="relative">
                       <input
-                        type={showPassword.confirm ? 'text' : 'password'}
+                        type={showPassword.confirm ? "text" : "password"}
                         name="confirmPassword"
                         value={form.confirmPassword}
                         onChange={handleChange}
@@ -338,15 +362,19 @@ export default function Profile() {
                       />
                       <button
                         type="button"
-                        onClick={() => togglePasswordVisibility('confirm')}
+                        onClick={() => togglePasswordVisibility("confirm")}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
                       >
-                        {showPassword.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword.confirm ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-full bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-medium mt-4"
                   >
                     Change Password
@@ -355,8 +383,12 @@ export default function Profile() {
               ) : (
                 <div className="text-center py-6">
                   <Lock size={40} className="mx-auto text-zinc-600 mb-4" />
-                  <p className="text-zinc-400">Password management is disabled</p>
-                  <p className="text-sm text-zinc-500 mt-2">Click "Change" to update your password</p>
+                  <p className="text-zinc-400">
+                    Password management is disabled
+                  </p>
+                  <p className="text-sm text-zinc-500 mt-2">
+                    Click "Change" to update your password
+                  </p>
                 </div>
               )}
             </div>
@@ -372,7 +404,9 @@ function InfoRow({ icon, label, value }) {
     <div className="flex items-start gap-3">
       <div className="mt-0.5 flex-shrink-0">{icon}</div>
       <div>
-        <div className="text-xs uppercase tracking-wider text-zinc-400">{label}</div>
+        <div className="text-xs uppercase tracking-wider text-zinc-400">
+          {label}
+        </div>
         <div className="text-white">{value}</div>
       </div>
     </div>

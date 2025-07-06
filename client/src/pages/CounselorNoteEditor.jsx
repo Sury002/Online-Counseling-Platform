@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { API } from "../api";
 import {
-  Calendar,
   FileText,
   Lock,
   CheckCircle,
@@ -106,7 +105,9 @@ export default function CounselorNoteEditor() {
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">
-          {selectedAppointment ? selectedAppointment.clientId?.name : "Notes"}
+          {selectedAppointment
+            ? selectedAppointment.clientId?.name
+            : " Session Notes "}
         </h1>
         <button
           onClick={() => setShowAppointments(!showAppointments)}
@@ -124,7 +125,7 @@ export default function CounselorNoteEditor() {
       >
         <div className="p-6 h-full flex flex-col">
           <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-            Counselor Portal
+            Session Notes
           </div>
 
           <Link
@@ -137,7 +138,7 @@ export default function CounselorNoteEditor() {
           </Link>
 
           <Link
-            to="/appointments"
+            to="/appointments/counselor"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
@@ -182,7 +183,7 @@ export default function CounselorNoteEditor() {
           </button>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Shield className="text-indigo-600 dark:text-indigo-400" />
-            Client Sessions
+            My Notes
           </h2>
         </div>
 
@@ -264,7 +265,7 @@ export default function CounselorNoteEditor() {
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
             <FileText className="text-indigo-600 dark:text-indigo-400" />
-            <h1 className="text-2xl font-bold">Session Notes</h1>
+            <h1 className="text-2xl font-bold">Notes</h1>
           </div>
 
           {!selectedAppointment ? (

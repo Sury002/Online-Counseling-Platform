@@ -1,35 +1,38 @@
-import { useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { API } from '../api';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { API } from "../api";
+import { Link } from "react-router-dom";
 
 export default function ResetPassword() {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [msg, setMsg] = useState('');
-  const [error, setError] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       setError("Passwords don't match");
       return;
     }
 
     setIsLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
-      const res = await API.post('/auth/reset-password', { token, newPassword });
+      const res = await API.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
       setMsg(res.data.msg);
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
-      setError(err.response?.data?.msg || 'Password reset failed');
+      setError(err.response?.data?.msg || "Password reset failed");
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +94,7 @@ export default function ResetPassword() {
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition duration-200 ${
-              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
             {isLoading ? (
@@ -119,14 +122,14 @@ export default function ResetPassword() {
                 Resetting...
               </span>
             ) : (
-              'Reset Password'
+              "Reset Password"
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>
-            Remember your password?{' '}
+            Remember your password?{" "}
             <Link
               to="/login"
               className="font-medium text-blue-600 hover:text-blue-800 hover:underline"

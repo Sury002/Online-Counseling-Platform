@@ -16,11 +16,9 @@ const sendEmail = async ({ to, subject, html }) => {
       subject,
       html,
     });
-
-    console.log("✅ Email sent to:", to);
   } catch (err) {
-    console.error("❌ Error sending email:", err); // 🔥 Show actual error in terminal
-    throw err; // important to make the /forgot-password route return 500
+    console.error("❌ Error sending email:", err);
+    throw err;
   }
 };
 

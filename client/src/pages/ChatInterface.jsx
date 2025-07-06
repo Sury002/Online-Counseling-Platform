@@ -18,7 +18,7 @@ import {
   CalendarDays,
   LogOut,
   Menu,
-  ChevronLeft
+  ChevronLeft,
 } from "lucide-react";
 
 export default function ChatInterface() {
@@ -36,7 +36,6 @@ export default function ChatInterface() {
   const [showAppointments, setShowAppointments] = useState(true);
   const bottomRef = useRef();
 
-  // Close sidebars when a selection is made on mobile
   useEffect(() => {
     if (selected && window.innerWidth < 768) {
       setShowSidebar(false);
@@ -170,7 +169,7 @@ export default function ChatInterface() {
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">
-          {selected ? selected.counselorId.name : "Chat"}
+          {selected ? selected.counselorId.name : "Chat Sessions"}
         </h1>
         <button
           onClick={() => setShowAppointments(!showAppointments)}
@@ -190,7 +189,7 @@ export default function ChatInterface() {
           <div className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
             Chat Sessions
           </div>
-          
+
           <Link
             to="/dashboard"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -199,7 +198,7 @@ export default function ChatInterface() {
             <NotebookPen className="h-5 w-5" />
             <span>Dashboard</span>
           </Link>
-          
+
           <Link
             to="/appointments"
             className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
@@ -208,7 +207,7 @@ export default function ChatInterface() {
             <CalendarDays className="h-5 w-5" />
             <span>Appointments</span>
           </Link>
-          
+
           <Link
             to="/login"
             onClick={() => {
@@ -246,7 +245,7 @@ export default function ChatInterface() {
           </button>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <MessageSquare className="text-indigo-600 dark:text-indigo-400" />
-            Counseling Sessions
+            My Chats
           </h2>
         </div>
 

@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import io from 'socket.io-client';
-import { API } from '../api';
+import { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import io from "socket.io-client";
+import { API } from "../api";
 
-const socket = io('http://localhost:5000', { autoConnect: false });
+const socket = io("http://localhost:5000", { autoConnect: false });
 
 export default function Chat({ senderId }) {
   const { appointmentId } = useParams();
   const [receiverId, setReceiverId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [roomId, setRoomId] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [appointmentInfo, setAppointmentInfo] = useState(null);
   const bottomRef = useRef();
 
@@ -23,26 +23,28 @@ export default function Chat({ senderId }) {
         setAppointmentInfo(appointment);
 
         const isClient = senderId === appointment.clientId._id;
-        const receiver = isClient ? appointment.counselorId._id : appointment.clientId._id;
+        const receiver = isClient
+          ? appointment.counselorId._id
+          : appointment.clientId._id;
         setReceiverId(receiver);
 
-        const room = [senderId, receiver].sort().join('_');
+        const room = [senderId, receiver].sort().join("_");
         setRoomId(room);
 
         socket.connect();
-        socket.emit('join', room);
+        socket.emit("join", room);
 
         const chatRes = await API.get(`/chat/appointment/${appointmentId}`);
         setMessages(chatRes.data);
 
-        socket.off('receive-message');
-        socket.on('receive-message', (msg) => {
+        socket.off("receive-message");
+        socket.on("receive-message", (msg) => {
           if (msg.appointmentId === appointmentId) {
             setMessages((prev) => [...prev, msg]);
           }
         });
       } catch (err) {
-        setError('❌ Failed to load chat. Please check appointment.');
+        setError("❌ Failed to load chat. Please check appointment.");
         console.error(err);
       }
     };
@@ -50,13 +52,13 @@ export default function Chat({ senderId }) {
     initChat();
 
     return () => {
-      socket.off('receive-message');
+      socket.off("receive-message");
       socket.disconnect();
     };
   }, [appointmentId, senderId]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async (e) => {
@@ -70,13 +72,13 @@ export default function Chat({ senderId }) {
       appointmentId,
     };
 
-    socket.emit('send-message', { roomId, message: msg });
+    socket.emit("send-message", { roomId, message: msg });
 
     try {
-      await API.post('/chat', msg);
-      setText('');
+      await API.post("/chat", msg);
+      setText("");
     } catch (err) {
-      console.error('❌ Failed to send message:', err);
+      console.error("❌ Failed to send message:", err);
     }
   };
 
@@ -86,10 +88,13 @@ export default function Chat({ senderId }) {
         {/* Header */}
         <div className="bg-zinc-700 px-6 py-4 border-b border-zinc-600">
           <h2 className="text-lg font-semibold">
-            💬 Chat with {appointmentInfo?.clientId?.name || appointmentInfo?.counselorId?.name}
+            💬 Chat with{" "}
+            {appointmentInfo?.clientId?.name ||
+              appointmentInfo?.counselorId?.name}
           </h2>
           <p className="text-sm text-zinc-400">
-            Session: {appointmentInfo?.sessionType} | Date: {new Date(appointmentInfo?.date).toLocaleString()}
+            Session: {appointmentInfo?.sessionType} | Date:{" "}
+            {new Date(appointmentInfo?.date).toLocaleString()}
           </p>
         </div>
 
@@ -103,8 +108,8 @@ export default function Chat({ senderId }) {
                 key={i}
                 className={`max-w-[75%] p-3 rounded-lg text-sm ${
                   msg.sender === senderId
-                    ? 'bg-blue-600 text-white self-end ml-auto'
-                    : 'bg-zinc-700 text-white self-start'
+                    ? "bg-blue-600 text-white self-end ml-auto"
+                    : "bg-zinc-700 text-white self-start"
                 }`}
               >
                 {msg.message}
@@ -115,7 +120,10 @@ export default function Chat({ senderId }) {
         </div>
 
         {/* Input */}
-        <form onSubmit={sendMessage} className="flex gap-2 px-4 py-3 border-t border-zinc-600 bg-zinc-800">
+        <form
+          onSubmit={sendMessage}
+          className="flex gap-2 px-4 py-3 border-t border-zinc-600 bg-zinc-800"
+        >
           <input
             type="text"
             className="flex-1 bg-zinc-700 text-white border border-zinc-600 rounded px-4 py-2 outline-none"

@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { API } from '../api';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { API } from "../api";
+import { Link } from "react-router-dom";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
-  const [msg, setMsg] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await API.post('/auth/forgot-password', { email });
+      const res = await API.post("/auth/forgot-password", { email });
       setMsg(res.data.msg);
-      setError('');
+      setError("");
     } catch (err) {
-      setError(err.response?.data?.msg || 'Something went wrong');
+      setError(err.response?.data?.msg || "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +63,7 @@ export default function ForgotPassword() {
             type="submit"
             disabled={isLoading}
             className={`w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition duration-200 ${
-              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
             {isLoading ? (
@@ -91,14 +91,14 @@ export default function ForgotPassword() {
                 Sending...
               </span>
             ) : (
-              'Send Reset Link'
+              "Send Reset Link"
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>
-            Remember your password?{' '}
+            Remember your password?{" "}
             <Link
               to="/login"
               className="font-medium text-blue-600 hover:text-blue-800 hover:underline"

@@ -15,7 +15,7 @@ router.post("/register", async (req, res) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ msg: "User already exists" });
 
-    const user = new User({ name, email, password, role }); 
+    const user = new User({ name, email, password, role });
     await user.save();
 
     res.status(201).json({ msg: "User registered successfully" });
@@ -60,7 +60,7 @@ router.post("/forgot-password", async (req, res) => {
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    user.resetPasswordExpires = Date.now() + 3600000;
     await user.save();
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
@@ -71,10 +71,6 @@ router.post("/forgot-password", async (req, res) => {
       <a href="${resetUrl}">${resetUrl}</a>
       <p>This link expires in 1 hour.</p>
     `;
-
-    // 🧪 Log for debugging
-    console.log("Sending email to:", user.email);
-    console.log("Reset link:", resetUrl);
 
     await sendEmail({
       to: user.email,

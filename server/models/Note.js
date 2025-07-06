@@ -1,27 +1,26 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const noteSchema = new mongoose.Schema(
   {
     appointmentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Appointment',
+      ref: "Appointment",
       required: true,
-      index: true // ✅ faster queries for client side
+      index: true,
     },
     counselorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: false // ✅ not strictly required when client views note
+      ref: "User",
+      required: false,
     },
     content: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-// ✅ Optional: Ensure only one note per appointment-counselor pair
 noteSchema.index({ appointmentId: 1, counselorId: 1 }, { unique: true });
 
-module.exports = mongoose.model('Note', noteSchema);
+module.exports = mongoose.model("Note", noteSchema);

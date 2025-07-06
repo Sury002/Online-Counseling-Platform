@@ -1,20 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
-router.post('/send-email', async (req, res) => {
+router.post("/send-email", async (req, res) => {
   const { to, subject, body } = req.body;
 
   if (!to || !subject || !body) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS, 
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
@@ -25,10 +25,10 @@ router.post('/send-email', async (req, res) => {
       text: body,
     });
 
-    res.json({ message: 'Email sent successfully' });
+    res.json({ message: "Email sent successfully" });
   } catch (err) {
-    console.error('❌ Failed to send email:', err);
-    res.status(500).json({ error: 'Failed to send email' });
+    console.error("❌ Failed to send email:", err);
+    res.status(500).json({ error: "Failed to send email" });
   }
 });
 

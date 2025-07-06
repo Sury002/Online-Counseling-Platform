@@ -1,108 +1,117 @@
-const express = require('express');
-const Appointment = require('../models/Appointment');
-const User = require('../models/User');
+const express = require("express");
+const Appointment = require("../models/Appointment");
+const User = require("../models/User");
 
 const router = express.Router();
 
-// ✅ Book an appointment
-router.post('/book', async (req, res) => {
+// Book an appointment
+router.post("/book", async (req, res) => {
   const { clientId, counselorId, sessionType, date } = req.body;
 
   if (!clientId || !counselorId || !sessionType || !date) {
     return res.status(400).json({
-      msg: 'Missing fields in appointment booking',
-      received: { clientId, counselorId, sessionType, date }
+      msg: "Missing fields in appointment booking",
+      received: { clientId, counselorId, sessionType, date },
     });
   }
 
   try {
-    const appointment = await Appointment.create({ clientId, counselorId, sessionType, date });
+    const appointment = await Appointment.create({
+      clientId,
+      counselorId,
+      sessionType,
+      date,
+    });
     res.status(201).json(appointment);
   } catch (err) {
-    console.error('❌ DB Error:', err);
-    res.status(500).json({ msg: 'Error booking appointment' });
+    console.error("❌ DB Error:", err);
+    res.status(500).json({ msg: "Error booking appointment" });
   }
 });
 
-// ✅ Get all counselors
-router.get('/counselors', async (req, res) => {
+// Get all counselors
+router.get("/counselors", async (req, res) => {
   try {
-    const counselors = await User.find({ role: 'counselor' }, 'name email');
+    const counselors = await User.find({ role: "counselor" }, "name email");
     res.json(counselors);
   } catch (err) {
-    res.status(500).json({ msg: 'Error fetching counselors' });
+    res.status(500).json({ msg: "Error fetching counselors" });
   }
 });
 
-// ✅ Get appointments for a client or counselor
-router.get('/my/:userId', async (req, res) => {
+// Get appointments for a client or counselor
+router.get("/my/:userId", async (req, res) => {
   try {
     const appointments = await Appointment.find({
       $or: [
         { clientId: req.params.userId },
-        { counselorId: req.params.userId }
-      ]
+        { counselorId: req.params.userId },
+      ],
     })
       .sort({ date: -1 })
-      .populate('clientId', 'name email')
-      .populate('counselorId', 'name email');
+      .populate("clientId", "name email")
+      .populate("counselorId", "name email");
 
     res.json(appointments);
   } catch (err) {
-    res.status(500).json({ msg: 'Error fetching appointments' });
+    res.status(500).json({ msg: "Error fetching appointments" });
   }
 });
 
-// ✅ Get appointment by ID
-router.get('/:id', async (req, res) => {
+// Get appointment by ID
+router.get("/:id", async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id)
-      .populate('clientId', 'name email')
-      .populate('counselorId', 'name email');
+      .populate("clientId", "name email")
+      .populate("counselorId", "name email");
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
     res.json(appointment);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching appointment', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching appointment", error: err.message });
   }
 });
 
-router.get('/client/:clientId', async (req, res) => {
+router.get("/client/:clientId", async (req, res) => {
   try {
-    const appointments = await Appointment.find({ clientId: req.params.clientId })
+    const appointments = await Appointment.find({
+      clientId: req.params.clientId,
+    })
       .sort({ date: -1 })
-      .populate('counselorId', 'name email');
+      .populate("counselorId", "name email");
     res.json(appointments);
   } catch (err) {
-    res.status(500).json({ msg: 'Error fetching client appointments' });
+    res.status(500).json({ msg: "Error fetching client appointments" });
   }
 });
 
-// ✅ Cancel appointment
-router.patch('/:id/cancel', async (req, res) => {
+// Cancel appointment
+router.patch("/:id/cancel", async (req, res) => {
   try {
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
-      { status: 'cancelled' },
+      { status: "cancelled" },
       { new: true }
     );
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
-    res.json({ message: 'Appointment cancelled successfully', appointment });
+    res.json({ message: "Appointment cancelled successfully", appointment });
   } catch (err) {
-    console.error('❌ Cancel Error:', err);
-    res.status(500).json({ message: 'Error cancelling appointment' });
+    console.error("❌ Cancel Error:", err);
+    res.status(500).json({ message: "Error cancelling appointment" });
   }
 });
 
-// ✅ Manually mark appointment as paid (optional, admin/debug)
-router.patch('/:id/pay', async (req, res) => {
+// Manually mark appointment as paid
+router.patch("/:id/pay", async (req, res) => {
   try {
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
@@ -111,30 +120,30 @@ router.patch('/:id/pay', async (req, res) => {
     );
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
-    res.json({ message: 'Appointment marked as paid', appointment });
+    res.json({ message: "Appointment marked as paid", appointment });
   } catch (err) {
-    res.status(500).json({ message: 'Error updating payment status' });
+    res.status(500).json({ message: "Error updating payment status" });
   }
 });
 
-router.patch('/mark-completed/:id', async (req, res) => {
+router.patch("/mark-completed/:id", async (req, res) => {
   try {
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
-      { status: 'completed' },
+      { status: "completed" },
       { new: true }
     );
 
     if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
     res.json(appointment);
   } catch (err) {
-    res.status(500).json({ message: 'Error marking appointment as completed' });
+    res.status(500).json({ message: "Error marking appointment as completed" });
   }
 });
 
