@@ -120,8 +120,8 @@ export default function Dashboard() {
               />
               <NavItem
                 icon={<FileText size={20} className="text-emerald-500" />}
-                label="Session History"
-                to="/session-history"
+                label="Session Notes"
+                to="/session-notes"
               />
               <NavItem
                 icon={<Video size={20} className="text-rose-500" />}

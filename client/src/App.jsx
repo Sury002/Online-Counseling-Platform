@@ -201,7 +201,7 @@ function App() {
 
         {/* Session History */}
         <Route
-          path="/session-history"
+          path="/session-notes"
           element={
             <PrivateRoute>
               <SessionHistory />
