@@ -20,11 +20,11 @@ A secure, full-stack MERN application for online therapy and counseling services
 - 💬 **Real-time Chat**
   - Socket.IO-powered chat per appointment
   - Typing indicator, read receipts, timestamps
-  - Chat restricted to **paid sessions**
+  - Chat restricted to **unpaid sessions**
 
 - 📹 **Secure Video Calling**
   - Agora SDK integration for private sessions
-  - Mute/unmute, screen share, graceful fallback if no mic/cam
+  - Mute/unmute and on/off camera options
 
 - 💳 **Payment System**
   - Clients can pay per session
@@ -37,7 +37,7 @@ A secure, full-stack MERN application for online therapy and counseling services
 - 📝 **Session Notes**
   - Counselors can privately write session notes
   - Linked to each appointment
-  - Hidden from clients
+  - clients can view the session notes
 
 ---
 
