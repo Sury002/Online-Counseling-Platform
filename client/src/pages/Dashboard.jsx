@@ -9,6 +9,7 @@ import {
   CreditCard,
   User,
   LogOut,
+  FileText,
   BrainCircuit,
   HeartPulse,
   Smile,
@@ -118,7 +119,7 @@ export default function Dashboard() {
                 to="/chat"
               />
               <NavItem
-                icon={<BrainCircuit size={20} className="text-emerald-500" />}
+                icon={<FileText size={20} className="text-emerald-500" />}
                 label="Session History"
                 to="/session-history"
               />
