@@ -29,6 +29,10 @@ A secure, full-stack MERN application for online therapy and counseling services
 - 💳 **Payment System**
   - Clients can pay per session
   - Session access (chat, video) unlocked after payment
+  -     Card Number: 4242 4242 4242 4242
+        Expiry Date: Any future date (e.g., 12/34)
+        CVC: Any 3-digit number (e.g., 123)
+        ZIP: Any 5-digit number (e.g., 12345)
 
 - 📅 **Appointments**
   - Clients book sessions with counselors
@@ -38,7 +42,7 @@ A secure, full-stack MERN application for online therapy and counseling services
   - Counselors can privately write session notes
   - Linked to each appointment
   - clients can view the session notes
-
+ 
 ---
 
 ## 🛠 Tech Stack
