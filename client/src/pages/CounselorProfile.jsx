@@ -85,16 +85,22 @@ export default function CounselorProfile() {
         currentPassword: form.currentPassword,
         newPassword: form.newPassword,
       });
-      showMessage("Password changed successfully!", "success");
-      setIsPasswordEditing(false);
-      setForm((prev) => ({
-        ...prev,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      }));
-    } catch {
-      showMessage("Failed to change password", "error");
+
+      showMessage(
+        "Password changed successfully! Please login again.",
+        "success"
+      );
+
+      // Clear user session and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Password change error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to change password. Please try again.";
+      showMessage(errorMessage, "error");
     }
   };
 

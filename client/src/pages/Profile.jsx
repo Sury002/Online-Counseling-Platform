@@ -76,29 +76,32 @@ export default function Profile() {
   };
 
   const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    if (form.newPassword !== form.confirmPassword) {
-      showMessage("New passwords do not match", "error");
-      return;
-    }
+  e.preventDefault();
+  if (form.newPassword !== form.confirmPassword) {
+    showMessage("New passwords do not match", "error");
+    return;
+  }
 
-    try {
-      await API.put(`/users/change-password/${user._id}`, {
-        currentPassword: form.currentPassword,
-        newPassword: form.newPassword,
-      });
-      showMessage("Password changed successfully!", "success");
-      setIsPasswordEditing(false);
-      setForm((prev) => ({
-        ...prev,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      }));
-    } catch {
-      showMessage("Failed to change password", "error");
-    }
-  };
+  try {
+    await API.put(`/users/change-password/${user._id}`, {
+      currentPassword: form.currentPassword,
+      newPassword: form.newPassword,
+    });
+    
+    showMessage("Password changed successfully! Please login again.", "success");
+    
+    // Clear user session and redirect to login
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+    
+  } catch (error) {
+    console.error("Password change error:", error);
+    const errorMessage = error.response?.data?.message || 
+                        "Failed to change password. Please try again.";
+    showMessage(errorMessage, "error");
+  }
+};
 
   if (!user?._id)
     return <div className="text-center mt-20 text-white">Invalid user</div>;

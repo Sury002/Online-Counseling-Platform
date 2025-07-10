@@ -71,12 +71,12 @@ export default function CounselorDashboard({ userId }) {
       >
         <div className="flex flex-col h-full px-6 py-10">
           <div>
-            <div className="flex items-center gap-3 mb-12">
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-xl">
-                <BrainCircuit className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex items-center gap-2 mb-12">
+              <div className="w-10 h-10 p-3 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-base">
+                  W
+                </div>
               <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                Counselor Hub
+                WellMind
               </h2>
             </div>
 

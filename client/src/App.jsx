@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import BookAppointment from "./pages/BookAppointment";
@@ -26,28 +27,20 @@ import SessionHistory from "./pages/SessionHistory";
 import CounselorNoteEditor from "./pages/CounselorNoteEditor";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
+import ResendEmail from "./pages/ResendEmail";
+import MainLandingPage from "./pages/MainLandingPage";
 
-function App() {
-  const user = JSON.parse(localStorage.getItem("user"));
+function AppContent() {
+  const { user } = useAuth();
   const loggedInUserId = user?._id;
 
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            user?.role === "counselor" ? (
-              <Navigate to="/dashboard/counselor" />
-            ) : user?.role === "client" ? (
-              <Navigate to="/dashboard/client" />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-
         {/* Public */}
+        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/" element={<MainLandingPage user={user} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -209,10 +202,18 @@ function App() {
           }
         />
 
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/resend-verification" element={<ResendEmail />} />
       </Routes>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
