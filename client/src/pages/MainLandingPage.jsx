@@ -22,7 +22,7 @@ export default function MainLandingPage({ user }) {
                 W
               </div>
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Wellmind
+                WellMind
               </span>
             </div>
             <div className="flex gap-2 sm:gap-3">
@@ -322,7 +322,7 @@ export default function MainLandingPage({ user }) {
               </span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Getting started with Wellmind is quick and easy
+              Getting started with WellMind is quick and easy
             </p>
           </div>
 
@@ -426,7 +426,7 @@ export default function MainLandingPage({ user }) {
             </span>
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Hear from those who've experienced Wellmind firsthand
+            Hear from those who've experienced WellMind firsthand
           </p>
         </div>
 
@@ -436,7 +436,7 @@ export default function MainLandingPage({ user }) {
               name: "Sarah J.",
               role: "Client",
               quote:
-                "Wellmind changed my life. After struggling to find the right therapist locally, I found the perfect match here. The convenience and quality of care are unmatched.",
+                "WellMind changed my life. After struggling to find the right therapist locally, I found the perfect match here. The convenience and quality of care are unmatched.",
               avatar: "SJ",
             },
             {
@@ -450,14 +450,14 @@ export default function MainLandingPage({ user }) {
               name: "Alex M.",
               role: "Client",
               quote:
-                "I was hesitant about online therapy, but Wellmind made it so easy. My therapist truly understands me, and I can schedule sessions between classes.",
+                "I was hesitant about online therapy, but WellMind made it so easy. My therapist truly understands me, and I can schedule sessions between classes.",
               avatar: "AM",
             },
             {
               name: "Dr. Priya K.",
               role: "Counselor",
               quote:
-                "Wellmind's platform allows me to focus on my clients without administrative hassles. The secure tools make remote therapy just as effective as in-person.",
+                "WellMind's platform allows me to focus on my clients without administrative hassles. The secure tools make remote therapy just as effective as in-person.",
               avatar: "PK",
             },
           ].map((testimonial, index) => (
@@ -495,7 +495,7 @@ export default function MainLandingPage({ user }) {
               </span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Everything you need to know about Wellmind
+              Everything you need to know about WellMind
             </p>
           </div>
 
@@ -613,7 +613,7 @@ export default function MainLandingPage({ user }) {
                 <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">
                   W
                 </div>
-                <span className="text-2xl font-bold text-white">Wellmind</span>
+                <span className="text-2xl font-bold text-white">WellMind</span>
               </div>
               <p className="text-gray-400">
                 Professional online counseling platform for mental health and
@@ -707,7 +707,7 @@ export default function MainLandingPage({ user }) {
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center">
             <p>
-              &copy; {new Date().getFullYear()} Wellmind. All rights reserved.
+              &copy; {new Date().getFullYear()} WellMind. All rights reserved.
             </p>
           </div>
         </div>

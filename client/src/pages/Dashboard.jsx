@@ -131,9 +131,8 @@ export default function Dashboard() {
               <NavItem
                 icon={<CreditCard size={20} className="text-amber-400" />}
                 label="Payments"
-                to={latestAppointmentId ? `/pay/${latestAppointmentId}` : "#"}
-                disabled={!latestAppointmentId}
-              />
+                to="/pay/:appointmentId"
+               />
               <NavItem
                 icon={<User size={20} className="text-blue-400" />}
                 label="Profile"
