@@ -39,16 +39,11 @@ A secure, full-stack **MERN** application for online therapy and counseling serv
 
 ### 📅 Appointments
 - Clients can book sessions with available counselors
-- Counselors can accept, cancel, or complete appointments
+- Counselors can manage and complete appointments 
 
 ### 📝 Session Notes
 - Counselors can write and manage private session notes
-- Clients can view session notes after the session
-
-### 📧 Email Notifications
-- Email verification for new users
-- Password change confirmation email
-- Email fallback available if chat is disabled
+- Clients can view session notes 
 
 ### 🌐 Main Landing Page
 - Clean static landing page before login/register
