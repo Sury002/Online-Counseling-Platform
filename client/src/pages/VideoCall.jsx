@@ -33,6 +33,18 @@ export default function VideoCall() {
   const [networkStats, setNetworkStats] = useState(null);
   const [callStatus, setCallStatus] = useState("connecting");
   const [showHeaderInfo, setShowHeaderInfo] = useState(false);
+  const [hasMicPermission, setHasMicPermission] = useState(true);
+  const [hasCamPermission, setHasCamPermission] = useState(true);
+  const [devices, setDevices] = useState({
+    microphones: [],
+    cameras: [],
+    speakers: []
+  });
+  const [selectedDevices, setSelectedDevices] = useState({
+    microphone: 'default',
+    camera: 'default',
+    speaker: 'default'
+  });
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -76,6 +88,62 @@ export default function VideoCall() {
       .padStart(2, "0")}`;
   };
 
+  // Check media permissions
+  const checkPermissions = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      const audioTracks = stream.getAudioTracks();
+      const videoTracks = stream.getVideoTracks();
+      
+      setHasMicPermission(audioTracks.length > 0 && audioTracks[0].enabled);
+      setHasCamPermission(videoTracks.length > 0 && videoTracks[0].enabled);
+      
+      stream.getTracks().forEach(track => track.stop());
+    } catch (err) {
+      setHasMicPermission(false);
+      setHasCamPermission(false);
+      console.warn("Permission denied:", err);
+    }
+  };
+
+  // Get available devices
+  const getDevices = async () => {
+    try {
+      const devices = await AgoraRTC.getDevices();
+      const microphones = devices.filter(device => device.kind === 'audioinput');
+      const cameras = devices.filter(device => device.kind === 'videoinput');
+      const speakers = devices.filter(device => device.kind === 'audiooutput');
+      
+      setDevices({
+        microphones,
+        cameras,
+        speakers
+      });
+      
+      // Set default devices if available
+      if (microphones.length > 0) {
+        setSelectedDevices(prev => ({
+          ...prev,
+          microphone: microphones[0].deviceId
+        }));
+      }
+      if (cameras.length > 0) {
+        setSelectedDevices(prev => ({
+          ...prev,
+          camera: cameras[0].deviceId
+        }));
+      }
+      if (speakers.length > 0) {
+        setSelectedDevices(prev => ({
+          ...prev,
+          speaker: speakers[0].deviceId
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to get devices:", err);
+    }
+  };
+
   // Fetch appointment
   useEffect(() => {
     let isMounted = true;
@@ -103,16 +171,10 @@ export default function VideoCall() {
     };
   }, [appointmentId, navigate]);
 
+  // Check permissions and get devices on mount
   useEffect(() => {
-    // Trigger browser permission prompt (safe fallback)
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => {
-        stream.getTracks().forEach((track) => track.stop());
-      })
-      .catch((err) => {
-        console.warn("Mic/Cam permission denied or missing:", err.message);
-      });
+    checkPermissions();
+    getDevices();
   }, []);
 
   // Join Agora when appointment is ready
@@ -122,9 +184,6 @@ export default function VideoCall() {
     let isMounted = true;
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     rtcClientRef.current = client;
-
-    const isCounselor =
-      user._id.toString() === appointment.counselorId._id.toString();
 
     // Simulate connection quality
     const qualityInterval = setInterval(() => {
@@ -228,24 +287,38 @@ export default function VideoCall() {
           }));
         });
 
-        // Only the counselor publishes media
-        if (isCounselor) {
-          const devices = await AgoraRTC.getDevices();
-          const hasMic = devices.some((d) => d.kind === "audioinput");
-          const hasCam = devices.some((d) => d.kind === "videoinput");
-
-          if (!hasMic || !hasCam) {
-            console.warn("⚠ No mic/cam detected");
-            return;
+        // Publish media tracks for both counselor and client
+        try {
+          if (hasMicPermission) {
+            const micTrack = await AgoraRTC.createMicrophoneAudioTrack({
+              microphoneId: selectedDevices.microphone
+            }).catch(err => {
+              console.warn("Microphone access error:", err);
+              return null;
+            });
+            if (micTrack) {
+              localAudioTrackRef.current = micTrack;
+              await client.publish(micTrack);
+              setMicEnabled(true);
+            }
           }
 
-          const [micTrack, camTrack] =
-            await AgoraRTC.createMicrophoneAndCameraTracks();
-          localAudioTrackRef.current = micTrack;
-          localVideoTrackRef.current = camTrack;
-
-          await client.publish([micTrack, camTrack]);
-          camTrack.play(localVideoRef.current);
+          if (hasCamPermission) {
+            const camTrack = await AgoraRTC.createCameraVideoTrack({
+              cameraId: selectedDevices.camera
+            }).catch(err => {
+              console.warn("Camera access error:", err);
+              return null;
+            });
+            if (camTrack) {
+              localVideoTrackRef.current = camTrack;
+              await client.publish(camTrack);
+              camTrack.play(localVideoRef.current);
+              setCamEnabled(true);
+            }
+          }
+        } catch (err) {
+          console.error("Error creating/publishing tracks:", err);
         }
       } catch (err) {
         console.error("❌ Agora join error:", err);
@@ -266,11 +339,27 @@ export default function VideoCall() {
       };
       leaveCall();
     };
-  }, [appointment]);
+  }, [appointment, hasMicPermission, hasCamPermission, selectedDevices]);
 
   // Toggle mic
-  const toggleMic = () => {
-    if (localAudioTrackRef.current) {
+  const toggleMic = async () => {
+    if (!hasMicPermission) {
+      alert("Microphone permission was denied. Please enable it in your browser settings.");
+      return;
+    }
+    
+    if (!localAudioTrackRef.current) {
+      try {
+        const micTrack = await AgoraRTC.createMicrophoneAudioTrack({
+          microphoneId: selectedDevices.microphone
+        });
+        localAudioTrackRef.current = micTrack;
+        await rtcClientRef.current.publish(micTrack);
+        setMicEnabled(true);
+      } catch (err) {
+        console.error("Failed to enable microphone:", err);
+      }
+    } else {
       const newState = !micEnabled;
       localAudioTrackRef.current.setEnabled(newState);
       setMicEnabled(newState);
@@ -278,11 +367,66 @@ export default function VideoCall() {
   };
 
   // Toggle cam
-  const toggleCam = () => {
-    if (localVideoTrackRef.current) {
+  const toggleCam = async () => {
+    if (!hasCamPermission) {
+      alert("Camera permission was denied. Please enable it in your browser settings.");
+      return;
+    }
+    
+    if (!localVideoTrackRef.current) {
+      try {
+        const camTrack = await AgoraRTC.createCameraVideoTrack({
+          cameraId: selectedDevices.camera
+        });
+        localVideoTrackRef.current = camTrack;
+        await rtcClientRef.current.publish(camTrack);
+        camTrack.play(localVideoRef.current);
+        setCamEnabled(true);
+      } catch (err) {
+        console.error("Failed to enable camera:", err);
+      }
+    } else {
       const newState = !camEnabled;
       localVideoTrackRef.current.setEnabled(newState);
       setCamEnabled(newState);
+    }
+  };
+
+  // Handle device changes
+  const handleDeviceChange = async (type, deviceId) => {
+    setSelectedDevices(prev => ({
+      ...prev,
+      [type]: deviceId
+    }));
+
+    // Recreate track if it exists
+    if (type === 'microphone' && localAudioTrackRef.current) {
+      try {
+        await localAudioTrackRef.current.close();
+        const micTrack = await AgoraRTC.createMicrophoneAudioTrack({
+          microphoneId: deviceId
+        });
+        localAudioTrackRef.current = micTrack;
+        await rtcClientRef.current.publish(micTrack);
+        setMicEnabled(true);
+      } catch (err) {
+        console.error("Failed to switch microphone:", err);
+      }
+    }
+
+    if (type === 'camera' && localVideoTrackRef.current) {
+      try {
+        await localVideoTrackRef.current.close();
+        const camTrack = await AgoraRTC.createCameraVideoTrack({
+          cameraId: deviceId
+        });
+        localVideoTrackRef.current = camTrack;
+        await rtcClientRef.current.publish(camTrack);
+        camTrack.play(localVideoRef.current);
+        setCamEnabled(true);
+      } catch (err) {
+        console.error("Failed to switch camera:", err);
+      }
     }
   };
 
@@ -489,25 +633,46 @@ export default function VideoCall() {
               <label className="block text-sm text-gray-300 mb-1">
                 Microphone
               </label>
-              <select className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
-                <option>Default Microphone</option>
-                <option>Microphone 2</option>
+              <select 
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+                value={selectedDevices.microphone}
+                onChange={(e) => handleDeviceChange('microphone', e.target.value)}
+              >
+                {devices.microphones.map(device => (
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Microphone ${device.deviceId.slice(0, 5)}`}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm text-gray-300 mb-1">Camera</label>
-              <select className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
-                <option>Default Camera</option>
-                <option>Camera 2</option>
+              <select 
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+                value={selectedDevices.camera}
+                onChange={(e) => handleDeviceChange('camera', e.target.value)}
+              >
+                {devices.cameras.map(device => (
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Camera ${device.deviceId.slice(0, 5)}`}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm text-gray-300 mb-1">
                 Speaker
               </label>
-              <select className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
-                <option>Default Speaker</option>
-                <option>Headphones</option>
+              <select 
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+                value={selectedDevices.speaker}
+                onChange={(e) => handleDeviceChange('speaker', e.target.value)}
+              >
+                {devices.speakers.map(device => (
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Speaker ${device.deviceId.slice(0, 5)}`}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -557,6 +722,16 @@ export default function VideoCall() {
               </div>
             </div>
           )}
+          {!hasCamPermission && (
+            <div className="absolute inset-0 bg-red-900/80 flex items-center justify-center">
+              <div className="text-center p-4">
+                <VideoCameraSlashIcon className="h-6 w-6 text-red-300 mx-auto mb-1 md:h-8 md:w-8 md:mb-2" />
+                <p className="text-red-300 text-xs md:text-sm">
+                  Camera permission denied
+                </p>
+              </div>
+            </div>
+          )}
           <span className="absolute top-2 left-2 text-xs bg-gray-900/80 px-2 py-1 rounded-full text-white flex items-center">
             <UserIcon className="h-2.5 w-2.5 mr-1" />
             <span>You</span>
@@ -574,6 +749,7 @@ export default function VideoCall() {
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-red-500/90 hover:bg-red-600/90"
           } shadow-lg`}
+          disabled={!hasMicPermission}
         >
           {micEnabled ? (
             <MicrophoneIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
@@ -581,6 +757,9 @@ export default function VideoCall() {
             <NoSymbolIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
           )}
           <span className="text-xs">{micEnabled ? "Mute" : "Unmute"}</span>
+          {!hasMicPermission && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+          )}
         </button>
 
         <button
@@ -590,6 +769,7 @@ export default function VideoCall() {
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-red-500/90 hover:bg-red-600/90"
           } shadow-lg`}
+          disabled={!hasCamPermission}
         >
           {camEnabled ? (
             <VideoCameraIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
@@ -599,6 +779,9 @@ export default function VideoCall() {
           <span className="text-xs">
             {camEnabled ? "Stop Video" : "Start Video"}
           </span>
+          {!hasCamPermission && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+          )}
         </button>
 
         <button
