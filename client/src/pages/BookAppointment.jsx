@@ -80,16 +80,16 @@ export default function BookAppointment() {
   const today = new Date().toISOString().slice(0, 16);
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
       {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="p-2 rounded-lg hover:bg-gray-700"
         >
-          <Menu className="w-5 h-5 text-gray-800 dark:text-white" />
+          <Menu className="w-5 h-5 text-white" />
         </button>
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+        <h1 className="text-xl font-bold text-white">
           Book Session
         </h1>
         <div className="w-10"></div>
@@ -97,18 +97,18 @@ export default function BookAppointment() {
 
       {/* Navigation Sidebar - Mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-20 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform ${
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-gray-800 border-r border-gray-700 transform ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
         <div className="p-6 h-full flex flex-col">
-          <div className="text-2xl font-bold text-gray-800 dark:text-white mb-8">
+          <div className="text-2xl font-bold text-white mb-8">
             Book Session
           </div>
 
           <Link
             to="/dashboard"
-            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <NotebookPen className="h-5 w-5" />
@@ -117,7 +117,7 @@ export default function BookAppointment() {
 
           <Link
             to="/appointments"
-            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <CalendarDays className="h-5 w-5" />
@@ -130,7 +130,7 @@ export default function BookAppointment() {
               localStorage.clear();
               setShowSidebar(false);
             }}
-            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+            className="flex items-center gap-3 text-gray-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -158,13 +158,13 @@ export default function BookAppointment() {
             <div
               className={`px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 ${
                 notification.isSuccess
-                  ? "bg-green-50 border border-green-200"
-                  : "bg-red-50 border border-red-200"
+                  ? "bg-green-900/30 border border-green-700"
+                  : "bg-red-900/30 border border-red-700"
               }`}
             >
               <div
                 className={`flex-shrink-0 h-6 w-6 ${
-                  notification.isSuccess ? "text-green-500" : "text-red-500"
+                  notification.isSuccess ? "text-green-400" : "text-red-400"
                 }`}
               >
                 {notification.isSuccess ? (
@@ -199,7 +199,7 @@ export default function BookAppointment() {
               </div>
               <p
                 className={`text-sm font-medium ${
-                  notification.isSuccess ? "text-green-800" : "text-red-800"
+                  notification.isSuccess ? "text-green-300" : "text-red-300"
                 }`}
               >
                 {notification.message}
@@ -208,8 +208,8 @@ export default function BookAppointment() {
           </div>
         )}
 
-        <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
-          {/*  Hero Image - Hidden on mobile */}
+        <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
+          {/* Hero Image - Hidden on mobile */}
           <div className="hidden md:block relative">
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             <img
@@ -230,10 +230,10 @@ export default function BookAppointment() {
           {/* Right Form */}
           <div className="p-6 sm:p-8 md:p-10 lg:p-12">
             <div className="flex flex-col items-center mb-6 md:mb-8">
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-3 md:mb-4">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-900 rounded-full flex items-center justify-center mb-3 md:mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 md:h-6 md:w-6 text-blue-600 dark:text-blue-300"
+                  className="h-5 w-5 md:h-6 md:w-6 text-blue-300"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -246,17 +246,17 @@ export default function BookAppointment() {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
+              <h2 className="text-xl md:text-2xl font-bold text-white">
                 Book Your Appointment
               </h2>
-              <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs md:text-sm text-gray-400 mt-1">
                 Fill in the details below
               </p>
             </div>
 
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 dark:border-red-400 p-3 md:p-4 mb-4 md:mb-6 rounded">
-                <p className="text-red-700 dark:text-red-300 text-xs md:text-sm font-medium">
+              <div className="bg-red-900/30 border-l-4 border-red-400 p-3 md:p-4 mb-4 md:mb-6 rounded">
+                <p className="text-red-300 text-xs md:text-sm font-medium">
                   {error}
                 </p>
               </div>
@@ -265,7 +265,7 @@ export default function BookAppointment() {
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
               {/* Session Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 md:mb-3">
+                <label className="block text-sm font-medium text-gray-300 mb-2 md:mb-3">
                   Session Type
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -278,8 +278,8 @@ export default function BookAppointment() {
                       key={type}
                       className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md transition-colors text-xs sm:text-sm ${
                         form.sessionType === type
-                          ? "bg-blue-100 border border-blue-300 text-blue-700 dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-200"
-                          : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
+                          ? "bg-blue-900/50 border border-blue-700 text-blue-200"
+                          : "bg-gray-700 border border-gray-600 text-gray-200 hover:bg-gray-600"
                       }`}
                     >
                       <input
@@ -298,7 +298,7 @@ export default function BookAppointment() {
 
               {/* Counselor Select */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-1 md:mb-2">
                   Select Counselor
                 </label>
                 <div className="relative">
@@ -306,7 +306,7 @@ export default function BookAppointment() {
                     name="counselorId"
                     value={form.counselorId}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-300 rounded-lg bg-white text-gray-800 appearance-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
                     required
                   >
                     <option value="">Select a counselor</option>
@@ -335,7 +335,7 @@ export default function BookAppointment() {
 
               {/* DateTime Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-1 md:mb-2">
                   Select Date & Time
                 </label>
                 <input
@@ -344,7 +344,7 @@ export default function BookAppointment() {
                   value={form.date}
                   onChange={handleChange}
                   min={today}
-                  className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-300 rounded-lg bg-white text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
+                  className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
                   required
                 />
               </div>

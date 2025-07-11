@@ -13,7 +13,6 @@ import {
   CalendarIcon,
   Cog6ToothIcon,
   SignalIcon,
-  SignalSlashIcon,
   CheckCircleIcon,
   XCircleIcon,
   ChevronDownIcon,
@@ -57,6 +56,16 @@ export default function VideoCall() {
     uid: null,
     left: false,
   });
+
+  // Force dark mode on mount
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-gray-900');
+    return () => {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('bg-gray-900');
+    };
+  }, []);
 
   // Format call duration
   const formatTime = (seconds) => {
@@ -294,7 +303,7 @@ export default function VideoCall() {
 
   if (!appointment) {
     return (
-      <div className="flex justify-center items-center h-screen text-white bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="flex justify-center items-center h-screen text-white bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-lg">Preparing your call session...</p>
@@ -379,7 +388,7 @@ export default function VideoCall() {
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="p-4 bg-gray-800/80 backdrop-blur-sm text-white flex flex-col border-b border-gray-700/50 z-10">
+      <header className="p-4 bg-gray-800 border-b border-gray-700 text-white flex flex-col z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div
@@ -414,7 +423,7 @@ export default function VideoCall() {
           </div>
           <div className="flex items-center space-x-3">
             {networkStats && (
-              <div className="hidden md:flex items-center space-x-2 text-xs bg-gray-700/80 px-3 py-1.5 rounded-full">
+              <div className="hidden md:flex items-center space-x-2 text-xs bg-gray-700 px-3 py-1.5 rounded-full">
                 <SignalIcon className="h-3 w-3 text-green-400" />
                 <span>↑ {networkStats.uplink}</span>
                 <span>↓ {networkStats.downlink}</span>
@@ -470,7 +479,7 @@ export default function VideoCall() {
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="absolute right-4 top-16 md:top-20 bg-gray-800 rounded-lg shadow-xl p-4 z-20 w-64 border border-gray-700">
+        <div className="absolute right-4 top-16 md:top-20 bg-gray-800 rounded-lg shadow-xl p-4 z-20 w-64 border border-gray-700 text-white">
           <h3 className="font-medium mb-3 flex items-center">
             <Cog6ToothIcon className="h-5 w-5 mr-2" />
             Call Settings
@@ -557,14 +566,14 @@ export default function VideoCall() {
       </div>
 
       {/* Controls */}
-      <div className="p-2 md:p-4 bg-gray-800/80 backdrop-blur-sm border-t border-gray-700/50 flex justify-center space-x-2 md:space-x-6">
+      <div className="p-2 md:p-4 bg-gray-800 border-t border-gray-700 flex justify-center space-x-2 md:space-x-6">
         <button
           onClick={toggleMic}
           className={`flex flex-col items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl text-white font-medium transition-all ${
             micEnabled
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-red-500/90 hover:bg-red-600/90"
-          } shadow-lg hover:shadow-${micEnabled ? "gray" : "red"}-600/20`}
+          } shadow-lg`}
         >
           {micEnabled ? (
             <MicrophoneIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
@@ -580,7 +589,7 @@ export default function VideoCall() {
             camEnabled
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-red-500/90 hover:bg-red-600/90"
-          } shadow-lg hover:shadow-${camEnabled ? "gray" : "red"}-600/20`}
+          } shadow-lg`}
         >
           {camEnabled ? (
             <VideoCameraIcon className="h-5 w-5 md:h-6 md:w-6 mb-1" />
@@ -594,7 +603,7 @@ export default function VideoCall() {
 
         <button
           onClick={leaveCall}
-          className="flex flex-col items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all shadow-lg hover:shadow-red-600/20"
+          className="flex flex-col items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all shadow-lg"
         >
           <PhoneIcon className="h-5 w-5 md:h-6 md:w-6 mb-1 rotate-[135deg]" />
           <span className="text-xs">End Call</span>

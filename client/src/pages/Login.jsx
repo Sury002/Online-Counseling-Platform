@@ -44,26 +44,26 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 px-4 py-8">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-8">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-700">
         <div className="text-center mb-8">
-          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
-            <div className="w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-400 flex items-center justify-center text-white font-bold">
+          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-900/30 mb-4">
+            <div className="w-6 h-6 rounded-lg bg-indigo-400 flex items-center justify-center text-white font-bold">
               W
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Welcome Back</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">Sign in to continue to your account</p>
+          <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
+          <p className="text-gray-300 mt-2">Sign in to continue to your account</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg">
-            <p className="text-red-700 dark:text-red-300 font-medium text-center">{error}</p>
+          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
+            <p className="text-red-300 font-medium text-center">{error}</p>
             {showResend && (
               <div className="mt-2 text-center">
                 <Link
                   to={`/resend-verification?email=${encodeURIComponent(form.email)}`}
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium"
+                  className="text-indigo-400 hover:underline text-sm font-medium"
                 >
                   Resend verification email
                 </Link>
@@ -74,7 +74,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Email Address <span className="text-red-500">*</span>
             </label>
             <input
@@ -83,19 +83,19 @@ export default function Login() {
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 bg-gray-700 text-white"
               placeholder="your@email.com"
             />
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-gray-300">
                 Password <span className="text-red-500">*</span>
               </label>
               <Link
                 to="/forgot-password"
-                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline"
+                className="text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
               >
                 Forgot password?
               </Link>
@@ -107,7 +107,7 @@ export default function Login() {
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 bg-white dark:bg-gray-700 text-gray-800 dark:text-white pr-10"
+                className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 bg-gray-700 text-white pr-10"
                 placeholder="••••••••"
               />
               <button
@@ -116,7 +116,7 @@ export default function Login() {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 <svg
-                  className="h-5 w-5 text-gray-500 dark:text-gray-400"
+                  className="h-5 w-5 text-gray-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -154,9 +154,9 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 ${
+            className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 ${
               isLoading 
-                ? "bg-indigo-400 dark:bg-indigo-500 cursor-not-allowed" 
+                ? "bg-indigo-500 cursor-not-allowed" 
                 : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
             }`}
           >
@@ -190,26 +190,26 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-6 text-center text-sm text-gray-400">
           <p>
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline"
+              className="font-medium text-indigo-400 hover:text-indigo-300 hover:underline"
             >
               Create an account
             </Link>
           </p>
         </div>
 
-        <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+        <div className="mt-8 border-t border-gray-700 pt-6">
+          <p className="text-xs text-gray-400 text-center">
             By signing in, you agree to our{" "}
-            <Link to="/terms" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link to="/terms" className="text-indigo-400 hover:underline">
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link to="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link to="/privacy" className="text-indigo-400 hover:underline">
               Privacy Policy
             </Link>
           </p>

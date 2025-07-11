@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { API } from "../api";
 import { Link } from "react-router-dom";
 import {
-  UserCircle2,
+  User,
   Mail,
   Lock,
   Eye,
@@ -33,6 +33,16 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordEditing, setIsPasswordEditing] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+
+  // Force dark mode on mount
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-gray-900');
+    return () => {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('bg-gray-900');
+    };
+  }, []);
 
   useEffect(() => {
     if (!user?._id) return;
@@ -76,43 +86,42 @@ export default function Profile() {
   };
 
   const handlePasswordSubmit = async (e) => {
-  e.preventDefault();
-  if (form.newPassword !== form.confirmPassword) {
-    showMessage("New passwords do not match", "error");
-    return;
-  }
+    e.preventDefault();
+    if (form.newPassword !== form.confirmPassword) {
+      showMessage("New passwords do not match", "error");
+      return;
+    }
 
-  try {
-    await API.put(`/users/change-password/${user._id}`, {
-      currentPassword: form.currentPassword,
-      newPassword: form.newPassword,
-    });
-    
-    showMessage("Password changed successfully! Please login again.", "success");
-    
-    // Clear user session and redirect to login
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
-    
-  } catch (error) {
-    console.error("Password change error:", error);
-    const errorMessage = error.response?.data?.message || 
-                        "Failed to change password. Please try again.";
-    showMessage(errorMessage, "error");
-  }
-};
+    try {
+      await API.put(`/users/change-password/${user._id}`, {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
+      
+      showMessage("Password changed successfully! Please login again.", "success");
+      
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+      
+    } catch (error) {
+      console.error("Password change error:", error);
+      const errorMessage = error.response?.data?.message || 
+                          "Failed to change password. Please try again.";
+      showMessage(errorMessage, "error");
+    }
+  };
 
   if (!user?._id)
     return <div className="text-center mt-20 text-white">Invalid user</div>;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-zinc-900 to-zinc-800 text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900 text-white">
       {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-zinc-700 bg-zinc-800">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="p-2 rounded-lg hover:bg-zinc-700"
+          className="p-2 rounded-lg hover:bg-gray-700"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -122,16 +131,18 @@ export default function Profile() {
 
       {/* Navigation Sidebar - Mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-20 w-64 bg-zinc-800 border-r border-zinc-700 transform ${
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-gray-800 border-r border-gray-700 transform ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
         <div className="p-6 h-full flex flex-col">
-          <div className="text-2xl font-bold text-white mb-8">Profile</div>
+          <div className="text-2xl font-bold text-white mb-8 flex items-center gap-2">
+            Profile
+          </div>
 
           <Link
             to="/dashboard"
-            className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <NotebookPen className="h-5 w-5" />
@@ -140,7 +151,7 @@ export default function Profile() {
 
           <Link
             to="/appointments"
-            className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <CalendarDays className="h-5 w-5" />
@@ -153,7 +164,7 @@ export default function Profile() {
               localStorage.clear();
               setShowSidebar(false);
             }}
-            className="flex items-center gap-3 text-zinc-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+            className="flex items-center gap-3 text-gray-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -171,19 +182,19 @@ export default function Profile() {
 
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-8 overflow-auto">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
               Profile Settings
             </h2>
-            <p className="text-zinc-400">
-              Manage your account information and security
+            <p className="text-gray-400">
+              Manage your account information and security settings
             </p>
           </div>
 
           {msg.text && (
             <div
-              className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in ${
+              className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center ${
                 msg.type === "success"
                   ? "bg-emerald-600/80 text-white"
                   : "bg-red-600/80 text-white"
@@ -199,11 +210,11 @@ export default function Profile() {
           )}
 
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Profile Info Card */}
-            <div className="bg-zinc-800/70 border border-zinc-700/50 rounded-xl p-6 shadow-lg backdrop-blur-sm">
+            {/* Profile Information Card */}
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold flex items-center gap-2">
-                  <UserCircle2 className="text-blue-400 h-5 w-5" />
+                  <User className="text-blue-400 h-5 w-5" />
                   Profile Information
                 </h3>
                 {!isEditing ? (
@@ -216,7 +227,7 @@ export default function Profile() {
                 ) : (
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
+                    className="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-md"
                   >
                     Cancel
                   </button>
@@ -225,53 +236,45 @@ export default function Profile() {
 
               {isEditing ? (
                 <form onSubmit={handleProfileSubmit} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
-                      required
-                    />
-                  </div>
+                  <TextField
+                    label="Full Name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                  />
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium mt-4"
+                    className="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium"
                   >
                     Save Changes
                   </button>
                 </form>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
+                  <InfoRow label="Full Name" value={form.name} />
+                  <InfoRow label="Email" value={form.email} />
+                  <InfoRow label="Role" value={user.role} />
                   <InfoRow
-                    icon={<UserCircle2 size={18} className="text-blue-400" />}
-                    label="Name"
-                    value={form.name}
-                  />
-                  <InfoRow
-                    icon={<Mail size={18} className="text-purple-400" />}
-                    label="Email"
-                    value={form.email}
+                    label="Member Since"
+                    value={
+                      user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString()
+                        : "N/A"
+                    }
                   />
                 </div>
               )}
             </div>
 
-            {/* Password Card */}
-            <div className="bg-zinc-800/70 border border-zinc-700/50 rounded-xl p-6 shadow-lg backdrop-blur-sm">
+            {/* Password Settings Card */}
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold flex items-center gap-2">
                   <Lock className="text-purple-400 h-5 w-5" />
@@ -287,7 +290,7 @@ export default function Profile() {
                 ) : (
                   <button
                     onClick={() => setIsPasswordEditing(false)}
-                    className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
+                    className="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-md"
                   >
                     Cancel
                   </button>
@@ -296,100 +299,44 @@ export default function Profile() {
 
               {isPasswordEditing ? (
                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">
-                      Current Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword.current ? "text" : "password"}
-                        name="currentPassword"
-                        value={form.currentPassword}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 pr-10"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility("current")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
-                      >
-                        {showPassword.current ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">
-                      New Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword.new ? "text" : "password"}
-                        name="newPassword"
-                        value={form.newPassword}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 pr-10"
-                        required
-                        minLength="6"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility("new")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
-                      >
-                        {showPassword.new ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm text-zinc-400">
-                      Confirm Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword.confirm ? "text" : "password"}
-                        name="confirmPassword"
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 pr-10"
-                        required
-                        minLength="6"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility("confirm")}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
-                      >
-                        {showPassword.confirm ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
+                  <PasswordField
+                    label="Current Password"
+                    name="currentPassword"
+                    value={form.currentPassword}
+                    onChange={handleChange}
+                    visible={showPassword.current}
+                    toggle={() => togglePasswordVisibility("current")}
+                  />
+                  <PasswordField
+                    label="New Password"
+                    name="newPassword"
+                    value={form.newPassword}
+                    onChange={handleChange}
+                    visible={showPassword.new}
+                    toggle={() => togglePasswordVisibility("new")}
+                  />
+                  <PasswordField
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    value={form.confirmPassword}
+                    onChange={handleChange}
+                    visible={showPassword.confirm}
+                    toggle={() => togglePasswordVisibility("confirm")}
+                  />
                   <button
                     type="submit"
-                    className="w-full bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-medium mt-4"
+                    className="w-full bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-medium"
                   >
                     Change Password
                   </button>
                 </form>
               ) : (
                 <div className="text-center py-6">
-                  <Lock size={40} className="mx-auto text-zinc-600 mb-4" />
-                  <p className="text-zinc-400">
+                  <Lock size={40} className="mx-auto text-gray-600 mb-4" />
+                  <p className="text-gray-400">
                     Password management is disabled
                   </p>
-                  <p className="text-sm text-zinc-500 mt-2">
+                  <p className="text-sm text-gray-500 mt-2">
                     Click "Change" to update your password
                   </p>
                 </div>
@@ -402,15 +349,52 @@ export default function Profile() {
   );
 }
 
-function InfoRow({ icon, label, value }) {
+function InfoRow({ label, value }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="mt-0.5 flex-shrink-0">{icon}</div>
-      <div>
-        <div className="text-xs uppercase tracking-wider text-zinc-400">
-          {label}
-        </div>
-        <div className="text-white">{value}</div>
+    <div className="flex justify-between py-3 border-b border-gray-700">
+      <span className="text-sm text-gray-400">{label}</span>
+      <span className="text-sm font-medium text-white">{value}</span>
+    </div>
+  );
+}
+
+function TextField({ label, name, value, onChange, type = "text" }) {
+  return (
+    <div className="space-y-1">
+      <label className="block text-sm text-gray-400">{label}</label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
+        required
+      />
+    </div>
+  );
+}
+
+function PasswordField({ label, name, value, onChange, visible, toggle }) {
+  return (
+    <div className="space-y-1">
+      <label className="block text-sm text-gray-400">{label}</label>
+      <div className="relative">
+        <input
+          type={visible ? "text" : "password"}
+          name={name}
+          value={value}
+          onChange={onChange}
+          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 pr-10"
+          required
+          minLength="6"
+        />
+        <button
+          type="button"
+          onClick={toggle}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+        >
+          {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
       </div>
     </div>
   );

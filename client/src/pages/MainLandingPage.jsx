@@ -12,29 +12,29 @@ export default function MainLandingPage({ user }) {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-white">
-      {/* Navigation - Sleek sticky header */}
-      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
-        <div className="container mx-auto px-6 py-4">
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Navigation - Improved mobile responsiveness */}
+      <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 py-3">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm sm:text-lg">
                 W
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Wellmind
               </span>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <Link
                 to="/login"
-                className="px-5 py-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium"
+                className="px-3 py-1.5 sm:px-5 sm:py-2 text-sm sm:text-base text-gray-300 hover:text-indigo-400 transition font-medium"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg"
+                className="px-3 py-1.5 sm:px-5 sm:py-2 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg"
               >
                 Sign Up
               </Link>
@@ -43,46 +43,46 @@ export default function MainLandingPage({ user }) {
         </div>
       </nav>
 
-      {/* Hero Section - Modern gradient background */}
+      {/* Hero Section - Improved mobile layout */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 opacity-90"></div>
-        <div className="container mx-auto px-6 py-24 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-90"></div>
+        <div className="container mx-auto px-4 sm:px-6 py-16 md:py-24 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-16">
             <div className="lg:w-1/2">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   Mental Wellness
                 </span>
                 <br />
                 Made Accessible
               </h1>
-              <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-lg">
+              <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-lg">
                 Connect with licensed professionals through secure video
                 sessions, real-time messaging, and personalized therapy plans
                 tailored to your needs.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link
                   to="/register"
-                  className="px-7 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl text-center"
+                  className="px-5 py-2.5 sm:px-7 sm:py-3.5 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl text-center"
                 >
                   Start Your Journey
                 </Link>
                 <Link
                   to="/login"
-                  className="px-7 py-3.5 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-800 rounded-lg font-medium transition-all text-center"
+                  className="px-5 py-2.5 sm:px-7 sm:py-3.5 text-sm sm:text-base border-2 border-indigo-600 text-indigo-400 hover:bg-gray-800 rounded-lg font-medium transition-all text-center"
                 >
                   Existing User
                 </Link>
               </div>
             </div>
-            <div className="lg:w-1/2 mt-12 lg:mt-0">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] border-8 border-white dark:border-gray-800 transform hover:scale-[1.02] transition-transform">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center p-8">
+            <div className="lg:w-1/2 mt-8 sm:mt-12 lg:mt-0 w-full">
+              <div className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-xl sm:shadow-2xl aspect-[4/3] border-4 sm:border-8 border-gray-800 transform hover:scale-[1.02] transition-transform">
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center p-6 sm:p-8">
                   <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg">
                       <svg
-                        className="w-10 h-10"
+                        className="w-8 h-8 sm:w-10 sm:h-10"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -95,20 +95,20 @@ export default function MainLandingPage({ user }) {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">
+                    <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-white">
                       Secure Video Therapy
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    <p className="text-sm sm:text-base text-gray-300 mb-4">
                       HIPAA-compliant private sessions
                     </p>
-                    <div className="flex justify-center space-x-2">
-                      <span className="px-3 py-1 bg-white/80 dark:bg-gray-700/80 rounded-full text-xs font-medium">
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <span className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-700/80 rounded-full text-xs font-medium">
                         End-to-end encrypted
                       </span>
-                      <span className="px-3 py-1 bg-white/80 dark:bg-gray-700/80 rounded-full text-xs font-medium">
+                      <span className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-700/80 rounded-full text-xs font-medium">
                         High quality
                       </span>
-                      <span className="px-3 py-1 bg-white/80 dark:bg-gray-700/80 rounded-full text-xs font-medium">
+                      <span className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-700/80 rounded-full text-xs font-medium">
                         Easy to use
                       </span>
                     </div>
@@ -121,38 +121,38 @@ export default function MainLandingPage({ user }) {
       </section>
 
       {/* Stats Section - Animated counters */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+      <section className="py-16 bg-gray-800">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center p-6 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
+            <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-4xl font-bold text-indigo-400 mb-2">
                 10,000+
               </div>
-              <p className="text-gray-600 dark:text-gray-300 font-medium">
+              <p className="text-gray-300 font-medium">
                 Sessions Completed
               </p>
             </div>
-            <div className="text-center p-6 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
+            <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-4xl font-bold text-indigo-400 mb-2">
                 200+
               </div>
-              <p className="text-gray-600 dark:text-gray-300 font-medium">
+              <p className="text-gray-300 font-medium">
                 Licensed Professionals
               </p>
             </div>
-            <div className="text-center p-6 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
+            <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-4xl font-bold text-indigo-400 mb-2">
                 24/7
               </div>
-              <p className="text-gray-600 dark:text-gray-300 font-medium">
+              <p className="text-gray-300 font-medium">
                 Support Available
               </p>
             </div>
-            <div className="text-center p-6 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
+            <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-4xl font-bold text-indigo-400 mb-2">
                 95%
               </div>
-              <p className="text-gray-600 dark:text-gray-300 font-medium">
+              <p className="text-gray-300 font-medium">
                 Client Satisfaction
               </p>
             </div>
@@ -169,7 +169,7 @@ export default function MainLandingPage({ user }) {
               Therapy Platform
             </span>
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             All the tools you need for effective mental health support in one
             secure place
           </p>
@@ -297,13 +297,13 @@ export default function MainLandingPage({ user }) {
           ].map((feature, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 p-8 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all shadow-sm hover:shadow-md"
+              className="bg-gray-800 p-8 rounded-xl border border-gray-700 hover:border-indigo-500 transition-all shadow-sm hover:shadow-md"
             >
-              <div className="w-14 h-14 mb-6 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <div className="w-14 h-14 mb-6 bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-400">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 {feature.description}
               </p>
             </div>
@@ -312,7 +312,7 @@ export default function MainLandingPage({ user }) {
       </section>
 
       {/* How It Works - Timeline style */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+      <section className="py-20 bg-gray-800">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -321,7 +321,7 @@ export default function MainLandingPage({ user }) {
                 3-Step Process
               </span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Getting started with Wellmind is quick and easy
             </p>
           </div>
@@ -329,7 +329,7 @@ export default function MainLandingPage({ user }) {
           <div className="max-w-4xl mx-auto">
             <div className="relative">
               {/* Timeline line */}
-              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700 transform -translate-x-1/2"></div>
+              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-700 transform -translate-x-1/2"></div>
 
               {/* Steps */}
               {[
@@ -365,7 +365,7 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400">
+                          <p className="text-gray-400">
                             {step.description}
                           </p>
                         </div>
@@ -378,7 +378,7 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400">
+                          <p className="text-gray-400">
                             {step.description}
                           </p>
                         </div>
@@ -394,7 +394,7 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400">
+                          <p className="text-gray-400">
                             {step.description}
                           </p>
                         </div>
@@ -402,7 +402,7 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400">
+                          <p className="text-gray-400">
                             {step.description}
                           </p>
                         </div>
@@ -425,7 +425,7 @@ export default function MainLandingPage({ user }) {
               Clients & Professionals
             </span>
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Hear from those who've experienced Wellmind firsthand
           </p>
         </div>
@@ -463,20 +463,20 @@ export default function MainLandingPage({ user }) {
           ].map((testimonial, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+              className="bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center mb-6">
-                <div className="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-semibold text-lg mr-4">
+                <div className="w-14 h-14 rounded-full bg-indigo-900/30 flex items-center justify-center text-indigo-400 font-semibold text-lg mr-4">
                   {testimonial.avatar}
                 </div>
                 <div>
                   <h4 className="font-semibold">{testimonial.name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     {testimonial.role}
                   </p>
                 </div>
               </div>
-              <p className="text-gray-600 dark:text-gray-300 italic">
+              <p className="text-gray-300 italic">
                 "{testimonial.quote}"
               </p>
             </div>
@@ -485,7 +485,7 @@ export default function MainLandingPage({ user }) {
       </section>
 
       {/* FAQ Section - Accordion style */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+      <section className="py-20 bg-gray-800">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -494,7 +494,7 @@ export default function MainLandingPage({ user }) {
                 Questions
               </span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Everything you need to know about Wellmind
             </p>
           </div>
@@ -529,7 +529,7 @@ export default function MainLandingPage({ user }) {
             ].map((item, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="bg-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 <button
                   className="w-full p-6 text-left focus:outline-none"
@@ -540,7 +540,7 @@ export default function MainLandingPage({ user }) {
                   <h3 className="text-lg font-semibold flex items-center justify-between">
                     <span>{item.question}</span>
                     <svg
-                      className={`w-5 h-5 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 ${
+                      className={`w-5 h-5 text-indigo-400 transition-transform duration-200 ${
                         activeIndex === index ? "transform rotate-180" : ""
                       }`}
                       fill="none"
@@ -564,7 +564,7 @@ export default function MainLandingPage({ user }) {
                       : "max-h-0 opacity-0"
                   }`}
                 >
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-400">
                     {item.answer}
                   </p>
                 </div>

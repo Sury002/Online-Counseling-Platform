@@ -45,13 +45,13 @@ export default function VerifyEmail() {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 px-4 py-8">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-8">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-700">
         <div className="text-center mb-8">
-          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
+          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-900/30 mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
+              className="h-6 w-6 text-indigo-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -64,8 +64,8 @@ export default function VerifyEmail() {
               />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Email Verification</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
+          <h2 className="text-3xl font-bold text-white">Email Verification</h2>
+          <p className="text-gray-300 mt-2">
             {isLoading ? "Verifying your email..." : "Verification status"}
           </p>
         </div>
@@ -73,7 +73,7 @@ export default function VerifyEmail() {
         {isLoading ? (
           <div className="py-6 flex justify-center">
             <svg
-              className="animate-spin h-8 w-8 text-indigo-600 dark:text-indigo-400"
+              className="animate-spin h-8 w-8 text-indigo-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -96,23 +96,23 @@ export default function VerifyEmail() {
         ) : (
           <div className="space-y-6">
             {msg && (
-              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg">
-                <p className="text-green-700 dark:text-green-300 font-medium text-center">{msg}</p>
+              <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg">
+                <p className="text-green-300 font-medium text-center">{msg}</p>
               </div>
             )}
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg">
-                <p className="text-red-700 dark:text-red-300 font-medium text-center">{error}</p>
+              <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
+                <p className="text-red-300 font-medium text-center">{error}</p>
               </div>
             )}
 
             <div className="flex flex-col items-center space-y-4">
               <Link
                 to="/login"
-                className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-center ${
+                className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-center ${
                   isLoading 
-                    ? "bg-indigo-400 dark:bg-indigo-500 cursor-not-allowed" 
+                    ? "bg-indigo-500 cursor-not-allowed" 
                     : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                 }`}
               >
@@ -120,11 +120,11 @@ export default function VerifyEmail() {
               </Link>
 
               {error && !isLoading && (
-                <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-center text-sm text-gray-400">
                   <p className="mb-2">Need help with verification?</p>
                   <Link
                     to="/resend-verification"
-                    className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline"
+                    className="font-medium text-indigo-400 hover:text-indigo-300 hover:underline"
                   >
                     Resend verification email
                   </Link>

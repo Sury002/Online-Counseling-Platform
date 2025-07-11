@@ -54,39 +54,39 @@ export default function Dashboard() {
   const wellnessDimensions = [
     {
       title: "Physical",
-      icon: <HeartPulse className="w-5 h-5 text-rose-500" />,
+      icon: <HeartPulse className="w-5 h-5 text-rose-400" />,
     },
-    { title: "Emotional", icon: <Smile className="w-5 h-5 text-amber-500" /> },
-    { title: "Social", icon: <Users className="w-5 h-5 text-emerald-500" /> },
+    { title: "Emotional", icon: <Smile className="w-5 h-5 text-amber-400" /> },
+    { title: "Social", icon: <Users className="w-5 h-5 text-emerald-400" /> },
     {
       title: "Intellectual",
-      icon: <BookOpen className="w-5 h-5 text-blue-500" />,
+      icon: <BookOpen className="w-5 h-5 text-blue-400" />,
     },
-    { title: "Spiritual", icon: <Leaf className="w-5 h-5 text-green-500" /> },
+    { title: "Spiritual", icon: <Leaf className="w-5 h-5 text-green-400" /> },
     {
       title: "Occupational",
-      icon: <Briefcase className="w-5 h-5 text-violet-500" />,
+      icon: <Briefcase className="w-5 h-5 text-violet-400" />,
     },
   ];
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950">
+    <div className="min-h-screen flex bg-gray-900">
       {/* Mobile Sidebar Toggle */}
       <div className="md:hidden fixed top-4 right-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-lg"
+          className="bg-gray-800 p-2 rounded-lg shadow-lg"
         >
           {sidebarOpen ? (
-            <X className="w-6 h-6 dark:text-white" />
+            <X className="w-6 h-6 text-white" />
           ) : (
-            <Menu className="w-6 h-6 dark:text-white" />
+            <Menu className="w-6 h-6 text-white" />
           )}
         </button>
       </div>
 
       <aside
-        className={`fixed inset-y-0 left-0 w-72 bg-white/95 dark:bg-zinc-800/95 backdrop-blur-lg z-40 shadow-2xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:w-72 ${
+        className={`fixed inset-y-0 left-0 w-72 bg-gray-800/95 backdrop-blur-lg z-40 shadow-2xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:w-72 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -94,9 +94,9 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-2 mb-12">
               <div className="w-10 h-10 p-3 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-base">
-                  W
-                </div>
-              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                W
+              </div>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                 WellMind
               </h2>
             </div>
@@ -104,38 +104,38 @@ export default function Dashboard() {
             {/* Navigation with larger spacing */}
             <div className="space-y-3">
               <NavItem
-                icon={<CalendarPlus size={20} className="text-indigo-500" />}
+                icon={<CalendarPlus size={20} className="text-indigo-400" />}
                 label="Book Session"
                 to="/book"
               />
               <NavItem
-                icon={<CalendarCheck size={20} className="text-purple-500" />}
+                icon={<CalendarCheck size={20} className="text-purple-400" />}
                 label="Appointments"
                 to="/appointments"
               />
               <NavItem
-                icon={<MessageSquare size={20} className="text-cyan-500" />}
+                icon={<MessageSquare size={20} className="text-cyan-400" />}
                 label="Messages"
                 to="/chat"
               />
               <NavItem
-                icon={<FileText size={20} className="text-emerald-500" />}
+                icon={<FileText size={20} className="text-emerald-400" />}
                 label="Session Notes"
                 to="/session-notes"
               />
               <NavItem
-                icon={<Video size={20} className="text-rose-500" />}
+                icon={<Video size={20} className="text-rose-400" />}
                 label="Video Calls"
                 to="/call"
               />
               <NavItem
-                icon={<CreditCard size={20} className="text-amber-500" />}
+                icon={<CreditCard size={20} className="text-amber-400" />}
                 label="Payments"
                 to={latestAppointmentId ? `/pay/${latestAppointmentId}` : "#"}
                 disabled={!latestAppointmentId}
               />
               <NavItem
-                icon={<User size={20} className="text-blue-500" />}
+                icon={<User size={20} className="text-blue-400" />}
                 label="Profile"
                 to="/profile"
               />
@@ -144,7 +144,7 @@ export default function Dashboard() {
 
           <div className="mt-auto pt-10">
             <NavItem
-              icon={<LogOut size={20} className="text-rose-500" />}
+              icon={<LogOut size={20} className="text-rose-400" />}
               label="Logout"
               to="/login"
               onClick={() => localStorage.clear()}
@@ -162,12 +162,12 @@ export default function Dashboard() {
             alt="Counseling"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-zinc-800/80 flex flex-col justify-center items-start p-6 sm:p-8 md:p-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-800/80 flex flex-col justify-center items-start p-6 sm:p-8 md:p-10">
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
               Welcome, {user.name || "User"}{" "}
               <span className="text-indigo-300">👋</span>
             </h1>
-            <p className="text-zinc-200 text-sm sm:text-base max-w-xl">
+            <p className="text-gray-300 text-sm sm:text-base max-w-xl">
               Your journey to mental wellness starts here. Connect with
               professionals and access resources.
             </p>
@@ -210,29 +210,29 @@ export default function Dashboard() {
           <FeatureCard
             title="Book Appointments"
             description="Choose licensed counselors and book sessions."
-            icon={<CalendarPlus className="text-indigo-500 w-5 h-5" />}
-            color="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20"
+            icon={<CalendarPlus className="text-indigo-400 w-5 h-5" />}
+            color="bg-gradient-to-br from-indigo-900/20 to-indigo-800/20"
           />
           <FeatureCard
             title="Live Chat & Video"
             description="Secure and confidential communication."
-            icon={<MessageSquare className="text-purple-500 w-5 h-5" />}
-            color="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/20"
+            icon={<MessageSquare className="text-purple-400 w-5 h-5" />}
+            color="bg-gradient-to-br from-purple-900/20 to-purple-800/20"
           />
           <FeatureCard
             title="Session Notes"
             description="Access notes from previous sessions."
-            icon={<FileText className="text-emerald-500 w-5 h-5" />}
-            color="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20"
+            icon={<FileText className="text-emerald-400 w-5 h-5" />}
+            color="bg-gradient-to-br from-emerald-900/20 to-emerald-800/20"
           />
         </section>
 
-        <div className="bg-white dark:bg-zinc-800/30 backdrop-blur-sm rounded-2xl shadow-md p-5 sm:p-6 border border-white/20 dark:border-zinc-700/30">
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl shadow-md p-5 sm:p-6 border border-gray-700/30">
           <div className="mb-5 sm:mb-6">
-            <h2 className="text-xl font-bold text-zinc-800 dark:text-white">
+            <h2 className="text-xl font-bold text-white">
               Wellness Dimensions
             </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
+            <p className="text-gray-400 text-sm mt-1">
               Key areas for holistic mental health
             </p>
           </div>
@@ -241,12 +241,12 @@ export default function Dashboard() {
             {wellnessDimensions.map((dimension, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center justify-center p-3 bg-white dark:bg-zinc-800/50 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700/30"
+                className="flex flex-col items-center justify-center p-3 bg-gray-800/50 rounded-xl shadow-sm border border-gray-700/30"
               >
-                <div className="bg-white dark:bg-zinc-800 p-3 rounded-xl shadow-sm mb-2">
+                <div className="bg-gray-800 p-3 rounded-xl shadow-sm mb-2">
                   {dimension.icon}
                 </div>
-                <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center">
+                <h4 className="text-sm font-medium text-gray-300 text-center">
                   {dimension.title}
                 </h4>
               </div>
@@ -273,8 +273,8 @@ function NavItem({ icon, label, to, onClick, disabled }) {
       }}
       className={`flex items-center gap-4 py-4 px-4 rounded-xl text-base font-medium transition-all ${
         disabled
-          ? "text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-          : "text-zinc-700 dark:text-zinc-200 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400"
+          ? "text-gray-500 cursor-not-allowed"
+          : "text-gray-200 hover:bg-indigo-500/10 hover:text-indigo-400"
       }`}
     >
       <span className="flex-shrink-0">{icon}</span>
@@ -286,15 +286,13 @@ function NavItem({ icon, label, to, onClick, disabled }) {
 function FeatureCard({ title, description, icon, color }) {
   return (
     <div
-      className={`${color} p-5 rounded-2xl shadow-md flex flex-col gap-3 border border-zinc-200 dark:border-zinc-700 transition-all hover:-translate-y-1 hover:shadow-lg`}
+      className={`${color} p-5 rounded-2xl shadow-md flex flex-col gap-3 border border-gray-700 transition-all hover:-translate-y-1 hover:shadow-lg`}
     >
-      <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm">
+      <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center shadow-sm">
         {icon}
       </div>
-      <h4 className="text-md font-bold text-zinc-900 dark:text-white">
-        {title}
-      </h4>
-      <p className="text-xs text-zinc-600 dark:text-zinc-300">{description}</p>
+      <h4 className="text-md font-bold text-white">{title}</h4>
+      <p className="text-xs text-gray-300">{description}</p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { API } from "../api";
-import { Link } from "react-router-dom"; // Correct import for Link
+import { Link } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   CalendarDays,
@@ -22,6 +22,16 @@ export default function PayForSession() {
   const [loadingId, setLoadingId] = useState(null);
   const [error, setError] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
+
+  // Force dark mode on mount
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-gray-900');
+    return () => {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('bg-gray-900');
+    };
+  }, []);
 
   useEffect(() => {
     if (!user?._id) return;
@@ -69,12 +79,12 @@ export default function PayForSession() {
     return <div className="text-center mt-20 text-white">Invalid user</div>;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-zinc-900 to-zinc-800 text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900 text-white">
       {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-zinc-700 bg-zinc-800">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="p-2 rounded-lg hover:bg-zinc-700"
+          className="p-2 rounded-lg hover:bg-gray-700"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -84,7 +94,7 @@ export default function PayForSession() {
 
       {/* Navigation Sidebar - Mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-20 w-64 bg-zinc-800 border-r border-zinc-700 transform ${
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-gray-800 border-r border-gray-700 transform ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
@@ -93,7 +103,7 @@ export default function PayForSession() {
 
           <Link
             to="/dashboard"
-            className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <NotebookPen className="h-5 w-5" />
@@ -102,7 +112,7 @@ export default function PayForSession() {
 
           <Link
             to="/appointments"
-            className="flex items-center gap-3 text-zinc-300 hover:text-purple-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <CalendarDays className="h-5 w-5" />
@@ -115,7 +125,7 @@ export default function PayForSession() {
               localStorage.clear();
               setShowSidebar(false);
             }}
-            className="flex items-center gap-3 text-zinc-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+            className="flex items-center gap-3 text-gray-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -135,24 +145,24 @@ export default function PayForSession() {
       <div className="flex-1 p-4 md:p-8 overflow-auto">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
               Unpaid Appointments
             </h2>
-            <p className="text-zinc-400">
+            <p className="text-gray-400">
               Complete your payments to secure your sessions
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-600/80 text-white p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in">
+            <div className="bg-red-600/80 text-white p-3 mb-6 rounded-lg flex items-center gap-2 justify-center">
               <XCircle size={18} className="flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {appointments.length === 0 ? (
-            <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-8 text-center">
-              <p className="text-zinc-400 text-lg">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 text-center">
+              <p className="text-gray-400 text-lg">
                 You have no unpaid appointments
               </p>
             </div>
@@ -161,7 +171,7 @@ export default function PayForSession() {
               {appointments.map((appt) => (
                 <div
                   key={appt._id}
-                  className="bg-zinc-800/70 hover:bg-zinc-800/90 transition-all p-5 rounded-xl border border-zinc-700/50 shadow-lg backdrop-blur-sm"
+                  className="bg-gray-800 hover:bg-gray-800/90 transition-all p-5 rounded-xl border border-gray-700 shadow-lg"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                     <InfoRow
@@ -238,7 +248,7 @@ function InfoRow({ icon, label, value }) {
     <div className="flex items-start gap-3">
       <div className="mt-0.5 flex-shrink-0">{icon}</div>
       <div>
-        <div className="text-xs uppercase tracking-wider text-zinc-400">
+        <div className="text-xs uppercase tracking-wider text-gray-400">
           {label}
         </div>
         <div className="text-white">{value}</div>

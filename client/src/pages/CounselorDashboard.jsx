@@ -8,7 +8,6 @@ import {
   Video,
   User,
   LogOut,
-  BrainCircuit,
   FileText,
   Menu,
   X,
@@ -49,12 +48,12 @@ export default function CounselorDashboard({ userId }) {
   const upcoming = appointments.filter((a) => new Date(a.date) > new Date());
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950">
+    <div className="min-h-screen flex bg-gray-900">
       {/* Mobile Sidebar Toggle */}
       <div className="md:hidden fixed top-4 right-4 z-50">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-lg"
+          className="bg-gray-800 p-2 rounded-lg shadow-lg"
         >
           {sidebarOpen ? (
             <X className="w-6 h-6 text-white" />
@@ -65,7 +64,7 @@ export default function CounselorDashboard({ userId }) {
       </div>
 
       <aside
-        className={`fixed inset-y-0 left-0 w-72 bg-white/95 dark:bg-zinc-800/95 backdrop-blur-lg z-40 shadow-2xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:w-72 ${
+        className={`fixed inset-y-0 left-0 w-72 bg-gray-800/95 backdrop-blur-lg z-40 shadow-2xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:w-72 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -73,36 +72,36 @@ export default function CounselorDashboard({ userId }) {
           <div>
             <div className="flex items-center gap-2 mb-12">
               <div className="w-10 h-10 p-3 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-base">
-                  W
-                </div>
-              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                W
+              </div>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                 WellMind
               </h2>
             </div>
 
             <div className="space-y-3">
               <NavItem
-                icon={<CalendarCheck size={20} className="text-purple-500" />}
+                icon={<CalendarCheck size={20} className="text-purple-400" />}
                 label="Appointments"
                 to="/appointments/counselor"
               />
               <NavItem
-                icon={<MessageSquare size={20} className="text-emerald-500" />}
+                icon={<MessageSquare size={20} className="text-emerald-400" />}
                 label="Messages"
                 to="/chat/counselor"
               />
               <NavItem
-                icon={<Video size={20} className="text-rose-500" />}
+                icon={<Video size={20} className="text-rose-400" />}
                 label="Video Calls"
                 to="/call/counselor"
               />
               <NavItem
-                icon={<FileText size={20} className="text-amber-500" />}
+                icon={<FileText size={20} className="text-amber-400" />}
                 label="Session Notes"
                 to="/notes/counselor"
               />
               <NavItem
-                icon={<User size={20} className="text-blue-500" />}
+                icon={<User size={20} className="text-blue-400" />}
                 label="Profile"
                 to="/profile/counselor"
               />
@@ -111,7 +110,7 @@ export default function CounselorDashboard({ userId }) {
 
           <div className="mt-auto pt-10">
             <NavItem
-              icon={<LogOut size={20} className="text-rose-500" />}
+              icon={<LogOut size={20} className="text-rose-400" />}
               label="Logout"
               to="/login"
               onClick={() => localStorage.clear()}
@@ -129,11 +128,11 @@ export default function CounselorDashboard({ userId }) {
             alt="Counseling Dashboard"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-zinc-800/80 flex flex-col justify-center items-start p-6 sm:p-8 md:p-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-800/80 flex flex-col justify-center items-start p-6 sm:p-8 md:p-10">
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
               Welcome, Counselor <span className="text-indigo-300">👋</span>
             </h1>
-            <p className="text-zinc-200 text-sm sm:text-base max-w-xl">
+            <p className="text-gray-300 text-sm sm:text-base max-w-xl">
               Manage your counseling sessions and track your professional
               activities.
             </p>
@@ -172,20 +171,20 @@ export default function CounselorDashboard({ userId }) {
         </section>
 
         {/* Mental Health Insights */}
-        <div className="bg-white dark:bg-zinc-800/30 backdrop-blur-sm rounded-2xl shadow-md p-6 border border-white/20 dark:border-zinc-700/30 mb-8">
-          <h2 className="text-xl font-bold text-zinc-800 dark:text-white mb-6">
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl shadow-md p-6 border border-gray-700/30 mb-8">
+          <h2 className="text-xl font-bold text-white mb-6">
             Mental Health Insights
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex items-start gap-4">
-              <div className="bg-indigo-100 dark:bg-indigo-800/30 p-3 rounded-lg">
-                <HeartPulse className="w-6 h-6 text-indigo-600 dark:text-indigo-300" />
+              <div className="bg-indigo-800/30 p-3 rounded-lg">
+                <HeartPulse className="w-6 h-6 text-indigo-300" />
               </div>
               <div>
-                <h3 className="font-bold text-zinc-800 dark:text-white mb-2">
+                <h3 className="font-bold text-white mb-2">
                   Holistic Wellbeing
                 </h3>
-                <p className="text-zinc-600 dark:text-zinc-300">
+                <p className="text-gray-300">
                   Mental health is deeply connected to physical health, social
                   connections, and emotional resilience. Encourage clients to
                   consider all aspects of their wellbeing in their healing
@@ -194,14 +193,14 @@ export default function CounselorDashboard({ userId }) {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="bg-emerald-100 dark:bg-emerald-800/30 p-3 rounded-lg">
-                <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+              <div className="bg-emerald-800/30 p-3 rounded-lg">
+                <Shield className="w-6 h-6 text-emerald-300" />
               </div>
               <div>
-                <h3 className="font-bold text-zinc-800 dark:text-white mb-2">
+                <h3 className="font-bold text-white mb-2">
                   Resilience Building
                 </h3>
-                <p className="text-zinc-600 dark:text-zinc-300">
+                <p className="text-gray-300">
                   Developing coping strategies and emotional regulation skills
                   can significantly improve clients' ability to handle life's
                   challenges. Focus on strengths-based approaches in your
@@ -213,40 +212,32 @@ export default function CounselorDashboard({ userId }) {
         </div>
 
         {/* Counseling Trends */}
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl shadow-md p-6 border border-indigo-100 dark:border-indigo-800/30">
+        <div className="bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-2xl shadow-md p-6 border border-indigo-800/30">
           <div className="flex items-start gap-4">
-            <div className="bg-purple-100 dark:bg-purple-800/30 p-3 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-300" />
+            <div className="bg-purple-800/30 p-3 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-purple-300" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-zinc-800 dark:text-white mb-2">
+              <h3 className="text-lg font-bold text-white mb-2">
                 Emerging Trends in Counseling
               </h3>
-              <ul className="mt-3 space-y-3 text-sm text-zinc-700 dark:text-zinc-300">
+              <ul className="mt-3 space-y-3 text-sm text-gray-300">
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">
-                    •
-                  </span>
+                  <span className="text-purple-400">•</span>
                   <span>
                     Increased use of teletherapy and digital mental health tools
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">
-                    •
-                  </span>
+                  <span className="text-purple-400">•</span>
                   <span>Growing emphasis on culturally competent care</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">
-                    •
-                  </span>
+                  <span className="text-purple-400">•</span>
                   <span>Integration of mindfulness and somatic approaches</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-500 dark:text-purple-400">
-                    •
-                  </span>
+                  <span className="text-purple-400">•</span>
                   <span>Focus on preventative mental health care</span>
                 </li>
               </ul>
@@ -273,8 +264,8 @@ function NavItem({ icon, label, to, onClick, disabled }) {
       }}
       className={`flex items-center gap-4 py-4 px-4 rounded-xl text-base font-medium transition-all ${
         disabled
-          ? "text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-          : "text-zinc-700 dark:text-zinc-200 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400"
+          ? "text-gray-500 cursor-not-allowed"
+          : "text-gray-200 hover:bg-indigo-500/10 hover:text-indigo-400"
       }`}
     >
       <span className="flex-shrink-0">{icon}</span>

@@ -48,35 +48,35 @@ export default function Register() {
 
   const getPasswordStrengthColor = () => {
     switch (passwordStrength) {
-      case 0: return "bg-gray-200 dark:bg-gray-600";
+      case 0: return "bg-gray-600";
       case 1: return "bg-red-500";
       case 2: return "bg-yellow-500";
       case 3: return "bg-blue-500";
       case 4: return "bg-green-500";
       case 5: return "bg-green-600";
-      default: return "bg-gray-200 dark:bg-gray-600";
+      default: return "bg-gray-600";
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 px-4 py-8">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-8">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-700">
         <div className="text-center mb-8">
-          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
-            <div className="w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-400 flex items-center justify-center text-white font-bold">
+          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-900/30 mb-4">
+            <div className="w-6 h-6 rounded-lg bg-indigo-400 flex items-center justify-center text-white font-bold">
               W
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Create Account</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">Join our community today</p>
+          <h2 className="text-3xl font-bold text-white">Create Account</h2>
+          <p className="text-gray-300 mt-2">Join our community today</p>
         </div>
 
         {msg && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg">
-            <p className="text-green-700 dark:text-green-300 font-medium text-center">{msg}</p>
+          <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg">
+            <p className="text-green-300 font-medium text-center">{msg}</p>
             <Link
               to="/resend-verification"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm block mt-2 text-center"
+              className="text-indigo-400 hover:underline text-sm block mt-2 text-center"
             >
               Didn't receive email? Resend verification
             </Link>
@@ -84,14 +84,14 @@ export default function Register() {
         )}
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg">
-            <p className="text-red-700 dark:text-red-300 font-medium text-center">{error}</p>
+          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg">
+            <p className="text-red-300 font-medium text-center">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Full Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -100,12 +100,12 @@ export default function Register() {
               placeholder="John Doe"
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 bg-gray-700 text-white"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Email Address <span className="text-red-500">*</span>
             </label>
             <input
@@ -114,12 +114,12 @@ export default function Register() {
               placeholder="your@email.com"
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 bg-gray-700 text-white"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Password <span className="text-red-500">*</span>
             </label>
             <input
@@ -129,18 +129,18 @@ export default function Register() {
               onChange={handleChange}
               required
               minLength="8"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 bg-gray-700 text-white"
             />
             <div className="mt-2">
               <div className="flex items-center space-x-1">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div 
                     key={i} 
-                    className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? getPasswordStrengthColor() : 'bg-gray-200 dark:bg-gray-600'}`}
+                    className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? getPasswordStrengthColor() : 'bg-gray-600'}`}
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 {passwordStrength === 0 && "Enter a password"}
                 {passwordStrength === 1 && "Very weak"}
                 {passwordStrength === 2 && "Weak"}
@@ -152,19 +152,19 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Account Type <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <select
                 name="role"
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 appearance-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white pr-8"
+                className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 appearance-none bg-gray-700 text-white pr-8"
               >
                 <option value="client">Client</option>
                 <option value="counselor">Counselor</option>
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-300">
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
@@ -175,9 +175,9 @@ export default function Register() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 ${
+            className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 ${
               isLoading 
-                ? "bg-indigo-400 dark:bg-indigo-500 cursor-not-allowed" 
+                ? "bg-indigo-500 cursor-not-allowed" 
                 : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
             }`}
           >
@@ -211,26 +211,26 @@ export default function Register() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-6 text-center text-sm text-gray-400">
           <p>
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline"
+              className="font-medium text-indigo-400 hover:text-indigo-300 hover:underline"
             >
               Sign in here
             </Link>
           </p>
         </div>
 
-        <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+        <div className="mt-8 border-t border-gray-700 pt-6">
+          <p className="text-xs text-gray-400 text-center">
             By registering, you agree to our{" "}
-            <Link to="/terms" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link to="/terms" className="text-indigo-400 hover:underline">
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link to="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link to="/privacy" className="text-indigo-400 hover:underline">
               Privacy Policy
             </Link>
           </p>

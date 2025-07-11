@@ -33,6 +33,16 @@ export default function CounselorProfile() {
   const [isPasswordEditing, setIsPasswordEditing] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
 
+  // Force dark mode on mount
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-gray-900');
+    return () => {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('bg-gray-900');
+    };
+  }, []);
+
   useEffect(() => {
     API.get(`/users/${storedUser._id}`)
       .then((res) =>
@@ -105,12 +115,12 @@ export default function CounselorProfile() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-zinc-900 to-zinc-800 text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900 text-white">
       {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-zinc-700 bg-zinc-800">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="p-2 rounded-lg hover:bg-zinc-700"
+          className="p-2 rounded-lg hover:bg-gray-700"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -120,7 +130,7 @@ export default function CounselorProfile() {
 
       {/* Navigation Sidebar - Mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-20 w-64 bg-zinc-800 border-r border-zinc-700 transform ${
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-gray-800 border-r border-gray-700 transform ${
           showSidebar ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0 transition-transform duration-200 ease-in-out`}
       >
@@ -131,7 +141,7 @@ export default function CounselorProfile() {
 
           <Link
             to="/dashboard/counselor"
-            className="flex items-center gap-3 text-zinc-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <NotebookPen className="h-5 w-5" />
@@ -139,7 +149,7 @@ export default function CounselorProfile() {
           </Link>
           <Link
             to="/appointments/counselor"
-            className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
+            className="flex items-center gap-3 text-gray-300 hover:text-blue-400 p-2 rounded-lg transition-colors mb-4"
             onClick={() => setShowSidebar(false)}
           >
             <CalendarDays className="h-5 w-5" />
@@ -152,7 +162,7 @@ export default function CounselorProfile() {
               localStorage.clear();
               setShowSidebar(false);
             }}
-            className="flex items-center gap-3 text-zinc-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
+            className="flex items-center gap-3 text-gray-300 hover:text-red-400 p-2 rounded-lg transition-colors mt-auto"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -172,17 +182,17 @@ export default function CounselorProfile() {
       <div className="flex-1 p-4 md:p-8 overflow-auto">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
               Profile Settings
             </h2>
-            <p className="text-zinc-400">
+            <p className="text-gray-400">
               Manage your account information and security settings
             </p>
           </div>
 
           {msg.text && (
             <div
-              className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center animate-fade-in ${
+              className={`p-3 mb-6 rounded-lg flex items-center gap-2 justify-center ${
                 msg.type === "success"
                   ? "bg-emerald-600/80 text-white"
                   : "bg-red-600/80 text-white"
@@ -199,7 +209,7 @@ export default function CounselorProfile() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Profile Information Card */}
-            <div className="bg-zinc-800/70 border border-zinc-700/50 rounded-xl p-6 shadow-lg backdrop-blur-sm">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold flex items-center gap-2">
                   <User className="text-blue-400 h-5 w-5" />
@@ -215,7 +225,7 @@ export default function CounselorProfile() {
                 ) : (
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
+                    className="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-md"
                   >
                     Cancel
                   </button>
@@ -262,7 +272,7 @@ export default function CounselorProfile() {
             </div>
 
             {/* Password Settings Card */}
-            <div className="bg-zinc-800/70 border border-zinc-700/50 rounded-xl p-6 shadow-lg backdrop-blur-sm">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold flex items-center gap-2">
                   <Lock className="text-purple-400 h-5 w-5" />
@@ -278,7 +288,7 @@ export default function CounselorProfile() {
                 ) : (
                   <button
                     onClick={() => setIsPasswordEditing(false)}
-                    className="text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded-md"
+                    className="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-md"
                   >
                     Cancel
                   </button>
@@ -320,11 +330,11 @@ export default function CounselorProfile() {
                 </form>
               ) : (
                 <div className="text-center py-6">
-                  <Lock size={40} className="mx-auto text-zinc-600 mb-4" />
-                  <p className="text-zinc-400">
+                  <Lock size={40} className="mx-auto text-gray-600 mb-4" />
+                  <p className="text-gray-400">
                     Password management is disabled
                   </p>
-                  <p className="text-sm text-zinc-500 mt-2">
+                  <p className="text-sm text-gray-500 mt-2">
                     Click "Change" to update your password
                   </p>
                 </div>
@@ -339,8 +349,8 @@ export default function CounselorProfile() {
 
 function InfoRow({ label, value }) {
   return (
-    <div className="flex justify-between py-3 border-b border-zinc-700">
-      <span className="text-sm text-zinc-400">{label}</span>
+    <div className="flex justify-between py-3 border-b border-gray-700">
+      <span className="text-sm text-gray-400">{label}</span>
       <span className="text-sm font-medium text-white">{value}</span>
     </div>
   );
@@ -349,13 +359,13 @@ function InfoRow({ label, value }) {
 function TextField({ label, name, value, onChange, type = "text" }) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm text-zinc-400">{label}</label>
+      <label className="block text-sm text-gray-400">{label}</label>
       <input
         type={type}
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
         required
       />
     </div>
@@ -365,21 +375,21 @@ function TextField({ label, name, value, onChange, type = "text" }) {
 function PasswordField({ label, name, value, onChange, visible, toggle }) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm text-zinc-400">{label}</label>
+      <label className="block text-sm text-gray-400">{label}</label>
       <div className="relative">
         <input
           type={visible ? "text" : "password"}
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full px-4 py-2 rounded-lg bg-zinc-700/80 border border-zinc-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 pr-10"
+          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 pr-10"
           required
           minLength="6"
         />
         <button
           type="button"
           onClick={toggle}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
         >
           {visible ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>

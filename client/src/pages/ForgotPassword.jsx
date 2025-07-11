@@ -23,41 +23,41 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 px-4">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-700">
         <div className="text-center mb-8">
-          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
-            <div className="w-6 h-6 rounded-lg bg-indigo-600 dark:bg-indigo-400 flex items-center justify-center text-white font-bold">
+          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-indigo-900/30 mb-4">
+            <div className="w-6 h-6 rounded-lg bg-indigo-400 flex items-center justify-center text-white font-bold">
               W
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Reset Password</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
+          <h2 className="text-3xl font-bold text-white">Reset Password</h2>
+          <p className="text-gray-300 mt-2">
             Enter your email to receive a reset link
           </p>
         </div>
 
         {msg && (
-          <div className="mb-6 p-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm rounded-lg text-center border border-green-200 dark:border-green-700">
+          <div className="mb-6 p-3 bg-green-900/30 text-green-300 text-sm rounded-lg text-center border border-green-700">
             {msg}
           </div>
         )}
 
         {error && (
-          <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 text-sm rounded-lg text-center border border-red-200 dark:border-red-700">
+          <div className="mb-6 p-3 bg-red-900/30 text-red-300 text-sm rounded-lg text-center border border-red-700">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Email Address
             </label>
             <input
               type="email"
               placeholder="your@email.com"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 outline-none transition duration-200 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full px-4 py-3 rounded-lg border border-gray-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-800 outline-none transition duration-200 bg-gray-700 text-white"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -67,9 +67,9 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 ${
+            className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 ${
               isLoading 
-                ? "bg-indigo-400 dark:bg-indigo-500 cursor-not-allowed" 
+                ? "bg-indigo-500 cursor-not-allowed" 
                 : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
             }`}
           >
@@ -103,20 +103,20 @@ export default function ForgotPassword() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-6 text-center text-sm text-gray-400">
           <p>
             Remember your password?{" "}
             <Link
               to="/login"
-              className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline"
+              className="font-medium text-indigo-400 hover:text-indigo-300 hover:underline"
             >
               Sign in
             </Link>
           </p>
         </div>
 
-        <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+        <div className="mt-8 border-t border-gray-700 pt-6">
+          <p className="text-xs text-gray-400 text-center">
             We'll send you a link to reset your password
           </p>
         </div>
