@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   ChevronLeft,
+  X, 
 } from "lucide-react";
 
 export default function CallInterface() {
@@ -41,13 +42,17 @@ export default function CallInterface() {
   }, [senderId]);
 
   const joinCall = () => {
-    if (selected?.isPaid && selected?.status !== "completed") {
+    if (
+      selected?.isPaid &&
+      selected?.status !== "completed" &&
+      selected?.status !== "cancelled"
+    ) {
       navigate(`/video-call/${selected._id}`);
     }
   };
 
   const handlePayment = () => {
-    if (selected) {
+    if (selected && selected.status !== "cancelled") {
       navigate(`/pay/${selected._id}`);
     }
   };
@@ -180,17 +185,26 @@ export default function CallInterface() {
                           Completed
                         </span>
                       )}
-                      {!appt.isPaid ? (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-400 flex items-center gap-1">
+                    
+                      {appt.status === "cancelled" && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-300 flex items-center gap-1">
+                          <X className="w-3 h-3" />
+                          Cancelled
+                        </span>
+                      )}
+                      {!appt.isPaid && appt.status !== "cancelled" ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/30 text-amber-300 flex items-center gap-1">
                           <Lock className="w-3 h-3" />
                           Unpaid
                         </span>
-                      ) : (
+                      ) : appt.isPaid &&
+                        appt.status !== "cancelled" &&
+                        appt.status !== "completed" ? (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-green-900/30 text-green-300 flex items-center gap-1">
                           <Check className="w-3 h-3" />
                           Paid
                         </span>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
@@ -222,6 +236,25 @@ export default function CallInterface() {
             <p className="text-gray-400">
               Choose a video session from the sidebar to view details
             </p>
+          </div>
+        ) : selected.status === "cancelled" ? ( 
+          <div className="text-center max-w-md">
+            <div className="mx-auto w-20 h-20 bg-rose-900/20 rounded-full flex items-center justify-center mb-6">
+              <X className="w-8 h-8 text-rose-400" />
+            </div>
+            <h3 className="text-xl font-medium text-white mb-2">
+              Session Cancelled
+            </h3>
+            <p className="text-gray-400 mb-6">
+              This video session has been cancelled
+            </p>
+            <button
+              disabled
+              className="px-6 py-3 bg-gray-600 text-white rounded-lg font-medium flex items-center gap-2 mx-auto cursor-not-allowed"
+            >
+              <PhoneCall className="w-5 h-5" />
+              Call Cancelled
+            </button>
           </div>
         ) : selected.isPaid && selected.status !== "completed" ? (
           <div className="text-center max-w-md">

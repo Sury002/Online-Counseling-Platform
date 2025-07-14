@@ -6,7 +6,6 @@ import {
   FileText,
   Lock,
   CheckCircle,
-  XCircle,
   Clock,
   ChevronRight,
   Loader2,
@@ -16,6 +15,7 @@ import {
   Menu,
   ChevronLeft,
   User,
+  X,
 } from "lucide-react";
 
 export default function SessionHistory() {
@@ -54,7 +54,12 @@ export default function SessionHistory() {
   }, [user?._id]);
 
   useEffect(() => {
-    if (!selectedAppointment?._id || !selectedAppointment.isPaid) {
+   
+    if (
+      !selectedAppointment?._id ||
+      !selectedAppointment.isPaid ||
+      selectedAppointment.status === "cancelled"
+    ) {
       setNote(null);
       return;
     }
@@ -207,22 +212,31 @@ export default function SessionHistory() {
                   </div>
                   <div className="flex items-center gap-2">
                     {appt.status === "completed" && (
-                      <span className="text-xs px-2 py-1 rounded-full bg-emerald-900/30 text-emerald-300 flex items-center gap-1">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-900/30 text-emerald-300 flex items-center gap-1">
                         <CheckCircle className="w-3 h-3" />
                         Completed
                       </span>
                     )}
-                    {!appt.isPaid ? (
-                      <span className="text-xs px-2 py-1 rounded-full bg-rose-900/20 text-rose-400 flex items-center gap-1">
-                        <XCircle className="w-3 h-3" />
-                        Unpaid
-                      </span>
-                    ) : (
-                      <span className="text-xs px-2 py-1 rounded-full bg-emerald-900/20 text-emerald-400 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" />
-                        Paid
+                    {appt.status === "cancelled" && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-300 flex items-center gap-1">
+                        <X className="w-3 h-3" />
+                        Cancelled
                       </span>
                     )}
+                    {appt.status !== "cancelled" && !appt.isPaid && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/30 text-amber-300 flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        Unpaid
+                      </span>
+                    )}
+                    {appt.status !== "cancelled" &&
+                      appt.status !== "completed" &&
+                      appt.isPaid && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-900/30 text-green-300 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" />
+                          Paid
+                        </span>
+                      )}
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   </div>
                 </div>
@@ -258,14 +272,27 @@ export default function SessionHistory() {
                 Choose a session from the sidebar to view its notes
               </p>
             </div>
-          ) : !selectedAppointment.isPaid ? (
+          ) : !selectedAppointment.isPaid ||
+            selectedAppointment.status === "cancelled" ? (
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-              <div className="flex items-center gap-3 bg-amber-900/20 text-amber-300 p-4 rounded-lg mb-4">
+              <div
+                className={`flex items-center gap-3 p-4 rounded-lg mb-4 ${
+                  selectedAppointment.status === "cancelled"
+                    ? "bg-rose-900/20 text-rose-300"
+                    : "bg-amber-900/20 text-amber-300"
+                }`}
+              >
                 <Lock className="w-5 h-5" />
                 <div>
-                  <h3 className="font-medium">Session Locked</h3>
+                  <h3 className="font-medium">
+                    {selectedAppointment.status === "cancelled"
+                      ? "Session Cancelled"
+                      : "Session Locked"}
+                  </h3>
                   <p className="text-sm">
-                    Complete payment to view session notes
+                    {selectedAppointment.status === "cancelled"
+                      ? "Notes are not available for cancelled sessions"
+                      : "Complete payment to view session notes"}
                   </p>
                 </div>
               </div>
@@ -286,6 +313,21 @@ export default function SessionHistory() {
                     }
                   )}
                 </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selectedAppointment.status === "cancelled" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-300 flex items-center gap-1">
+                      <X className="w-3 h-3" />
+                      Cancelled
+                    </span>
+                  )}
+                  {selectedAppointment.status !== "cancelled" &&
+                    !selectedAppointment.isPaid && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/30 text-amber-300 flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        Unpaid
+                      </span>
+                    )}
+                </div>
               </div>
             </div>
           ) : loading ? (

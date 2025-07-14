@@ -32,8 +32,11 @@ export default function CounselorProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordEditing, setIsPasswordEditing] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPasswordAlert, setShowPasswordAlert] = useState(false);
 
-  // Force dark mode on mount
+
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900');
@@ -55,13 +58,36 @@ export default function CounselorProfile() {
       .catch(() => showMessage("Failed to fetch profile info", "error"));
   }, [storedUser._id]);
 
+  
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length > 0) strength += 1;
+    if (password.length >= 8) strength += 1;
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    return strength;
+  };
+
   const showMessage = (text, type) => {
     setMsg({ text, type });
     setTimeout(() => setMsg({ text: "", type: "" }), 5000);
   };
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    
+    
+    if (name === "newPassword") {
+      const strength = calculatePasswordStrength(value);
+      setPasswordStrength(strength);
+      
+      
+      if (showPasswordAlert && strength >= 4) {
+        setShowPasswordAlert(false);
+      }
+    }
   };
 
   const togglePasswordVisibility = (field) => {
@@ -85,6 +111,14 @@ export default function CounselorProfile() {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    
+   
+    if (passwordStrength < 4) {
+      showMessage("Password is too weak. Please make it stronger.", "error");
+      setShowPasswordAlert(true);
+      return;
+    }
+
     if (form.newPassword !== form.confirmPassword) {
       showMessage("New passwords do not match", "error");
       return;
@@ -101,7 +135,7 @@ export default function CounselorProfile() {
         "success"
       );
 
-      // Clear user session and redirect to login
+      
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
@@ -111,6 +145,31 @@ export default function CounselorProfile() {
         error.response?.data?.message ||
         "Failed to change password. Please try again.";
       showMessage(errorMessage, "error");
+    }
+  };
+
+  
+  const getPasswordStrengthColor = () => {
+    switch (passwordStrength) {
+      case 0: return "bg-gray-600";
+      case 1: return "bg-red-500";
+      case 2: return "bg-orange-500";
+      case 3: return "bg-yellow-500";
+      case 4: return "bg-green-500";
+      case 5: return "bg-green-600";
+      default: return "bg-gray-600";
+    }
+  };
+
+  const getPasswordStrengthText = () => {
+    switch (passwordStrength) {
+      case 0: return "Enter a password";
+      case 1: return "Very weak (needs at least 8 characters)";
+      case 2: return "Weak (add uppercase letters or numbers)";
+      case 3: return "Moderate (add special characters)";
+      case 4: return "Strong";
+      case 5: return "Very strong";
+      default: return "";
     }
   };
 
@@ -232,27 +291,32 @@ export default function CounselorProfile() {
                 )}
               </div>
 
-              {isEditing ? (
+               {isEditing ? (
                 <form onSubmit={handleProfileSubmit} className="space-y-4">
-                  <TextField
-                    label="Full Name"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                  />
+                  <div className="flex items-center gap-2">
+                    <TextField
+                      label="Full Name"
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                    />
+                    <button
+                      type="submit"
+                      className="mt-6 bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-md text-md"
+                    >
+                      Save
+                    </button>
+                  </div>
                   <TextField
                     label="Email"
                     name="email"
                     type="email"
                     value={form.email}
-                    onChange={handleChange}
+                    disabled
+                    readOnly
+                    tabIndex={-1}
+                    style={{ pointerEvents: "none" }}
                   />
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium"
-                  >
-                    Save Changes
-                  </button>
                 </form>
               ) : (
                 <div className="space-y-3">
@@ -287,7 +351,18 @@ export default function CounselorProfile() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => setIsPasswordEditing(false)}
+                    onClick={() => {
+                      setIsPasswordEditing(false);
+                    
+                      setForm(prev => ({
+                        ...prev,
+                        currentPassword: "",
+                        newPassword: "",
+                        confirmPassword: ""
+                      }));
+                      setPasswordStrength(0);
+                      setShowPasswordAlert(false);
+                    }}
                     className="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-md"
                   >
                     Cancel
@@ -305,14 +380,54 @@ export default function CounselorProfile() {
                     visible={showPassword.current}
                     toggle={() => togglePasswordVisibility("current")}
                   />
-                  <PasswordField
-                    label="New Password"
-                    name="newPassword"
-                    value={form.newPassword}
-                    onChange={handleChange}
-                    visible={showPassword.new}
-                    toggle={() => togglePasswordVisibility("new")}
-                  />
+                  
+                  <div>
+                    <PasswordField
+                      label="New Password"
+                      name="newPassword"
+                      value={form.newPassword}
+                      onChange={handleChange}
+                      visible={showPassword.new}
+                      toggle={() => togglePasswordVisibility("new")}
+                    />
+                    
+                    {/* Password strength meter */}
+                    {form.newPassword && (
+                      <div className="mt-2">
+                        <div className="flex items-center space-x-1">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <div 
+                              key={i} 
+                              className={`h-1.5 flex-1 rounded-full ${
+                                i <= passwordStrength 
+                                  ? getPasswordStrengthColor()
+                                  : 'bg-gray-600'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className={`text-xs mt-1 ${
+                          passwordStrength < 4 ? "text-amber-400" : "text-gray-400"
+                        }`}>
+                          {getPasswordStrengthText()}
+                        </p>
+                        
+                        {/* Password requirements alert */}
+                        {showPasswordAlert && passwordStrength < 4 && (
+                          <div className="mt-2 p-2 bg-red-900/30 border border-red-700 rounded text-xs text-amber-200">
+                            ⚠️ Password must include:
+                            <ul className="list-disc pl-5 mt-1">
+                              <li>At least 8 characters</li>
+                              <li>Uppercase letter</li>
+                              <li>Number</li>
+                              <li>Special character</li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
                   <PasswordField
                     label="Confirm Password"
                     name="confirmPassword"
@@ -321,6 +436,7 @@ export default function CounselorProfile() {
                     visible={showPassword.confirm}
                     toggle={() => togglePasswordVisibility("confirm")}
                   />
+                  
                   <button
                     type="submit"
                     className="w-full bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-medium"
@@ -356,7 +472,7 @@ function InfoRow({ label, value }) {
   );
 }
 
-function TextField({ label, name, value, onChange, type = "text" }) {
+function TextField({ label, name, value, onChange, type = "text", ...rest }) {
   return (
     <div className="space-y-1">
       <label className="block text-sm text-gray-400">{label}</label>
@@ -365,8 +481,11 @@ function TextField({ label, name, value, onChange, type = "text" }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
+        className={`w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 ${
+          rest.disabled ? "text-gray-400 cursor-not-allowed" : "text-white"
+        }`}
         required
+        {...rest}
       />
     </div>
   );

@@ -21,10 +21,10 @@ router.get("/:id", async (req, res) => {
 // Update profile (name, email)
 router.put("/:id", async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name } = req.body;
     const updated = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email },
+      { name },
       { new: true, runValidators: true, select: "-password" }
     );
     res.json(updated);

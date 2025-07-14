@@ -13,28 +13,46 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPasswordAlert, setShowPasswordAlert] = useState(false);
+
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length > 0) strength += 1;
+    if (password.length >= 8) strength += 1;
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    return strength;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
 
-    // Calculate password strength
     if (name === "password") {
-      let strength = 0;
-      if (value.length > 0) strength += 1;
-      if (value.length >= 8) strength += 1;
-      if (/[A-Z]/.test(value)) strength += 1;
-      if (/[0-9]/.test(value)) strength += 1;
-      if (/[^A-Za-z0-9]/.test(value)) strength += 1;
+      const strength = calculatePasswordStrength(value);
       setPasswordStrength(strength);
+      
+    
+      if (showPasswordAlert && strength >= 4) {
+        setShowPasswordAlert(false);
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (passwordStrength < 4) {
+      setShowPasswordAlert(true);
+      setError("Password is too weak. Please make it stronger.");
+      return;
+    }
+    
     setIsLoading(true);
     setError("");
     setMsg("");
+    setShowPasswordAlert(false);
 
     try {
       const res = await API.post("/auth/register", form);
@@ -50,11 +68,23 @@ export default function Register() {
     switch (passwordStrength) {
       case 0: return "bg-gray-600";
       case 1: return "bg-red-500";
-      case 2: return "bg-yellow-500";
-      case 3: return "bg-blue-500";
+      case 2: return "bg-orange-500";
+      case 3: return "bg-yellow-500";
       case 4: return "bg-green-500";
       case 5: return "bg-green-600";
       default: return "bg-gray-600";
+    }
+  };
+
+  const getPasswordStrengthText = () => {
+    switch (passwordStrength) {
+      case 0: return "Enter a password";
+      case 1: return "Very weak (needs at least 8 characters)";
+      case 2: return "Weak (add uppercase letters or numbers)";
+      case 3: return "Moderate (add special characters)";
+      case 4: return "Strong";
+      case 5: return "Very strong";
+      default: return "";
     }
   };
 
@@ -136,18 +166,31 @@ export default function Register() {
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div 
                     key={i} 
-                    className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? getPasswordStrengthColor() : 'bg-gray-600'}`}
+                    className={`h-1.5 flex-1 rounded-full ${
+                      i <= passwordStrength 
+                        ? getPasswordStrengthColor() 
+                        : 'bg-gray-600'
+                    }`}
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-1">
-                {passwordStrength === 0 && "Enter a password"}
-                {passwordStrength === 1 && "Very weak"}
-                {passwordStrength === 2 && "Weak"}
-                {passwordStrength === 3 && "Moderate"}
-                {passwordStrength === 4 && "Strong"}
-                {passwordStrength === 5 && "Very strong"}
+              <p className={`text-xs mt-1 ${
+                passwordStrength < 4 ? "text-amber-400" : "text-gray-400"
+              }`}>
+                {getPasswordStrengthText()}
               </p>
+              
+              {showPasswordAlert && (
+                <div className="mt-2 p-2 bg-red-900/30 border border-red-700 rounded text-xs text-amber-200">
+                  ⚠️ Password is too weak. Must include:
+                  <ul className="list-disc pl-5 mt-1">
+                    <li>At least 8 characters</li>
+                    <li>Uppercase letter</li>
+                    <li>Number</li>
+                    <li>Special character</li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 

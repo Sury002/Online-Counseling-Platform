@@ -17,6 +17,8 @@ import {
   LogOut,
   Menu,
   CalendarPlus,
+  Save,
+  X,
 } from "lucide-react";
 
 export default function MyAppointments({ userId }) {
@@ -25,8 +27,10 @@ export default function MyAppointments({ userId }) {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [newDateTime, setNewDateTime] = useState("");
 
-  // Force dark mode on mount
+  
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900');
@@ -62,6 +66,56 @@ export default function MyAppointments({ userId }) {
       setTimeout(() => setMsg(""), 3000);
     } catch {
       setMsg("Error cancelling appointment");
+    }
+  };
+
+  const startRescheduling = (appointment) => {
+    setEditingAppointment(appointment._id);
+
+    const date = new Date(appointment.date);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    setNewDateTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+  };
+
+  const cancelRescheduling = () => {
+    setEditingAppointment(null);
+    setNewDateTime("");
+  };
+
+  const saveRescheduling = async (id) => {
+    if (!newDateTime) {
+      setMsg("Please select a new date and time");
+      return;
+    }
+    
+    try {
+      
+      const isoDate = new Date(newDateTime).toISOString();
+      
+      setIsLoading(true);
+      const response = await API.patch(`/appointments/${id}/reschedule`, {
+        date: isoDate
+      });
+      
+   
+      setAppointments(prev => 
+        prev.map(appt => 
+          appt._id === id ? { ...appt, date: response.data.date } : appt
+        )
+      );
+      
+      setMsg("Appointment rescheduled successfully");
+      setEditingAppointment(null);
+      setTimeout(() => setMsg(""), 3000);
+    } catch (error) {
+      console.error("Reschedule error:", error);
+      setMsg(error.response?.data?.message || "Error rescheduling appointment");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -219,7 +273,7 @@ export default function MyAppointments({ userId }) {
           {msg && (
             <div
               className={`mb-6 px-4 py-3 rounded-lg text-sm font-medium ${
-                msg.includes("Error")
+                msg.includes("Error") || msg.includes("Please")
                   ? "bg-rose-900/30 text-rose-200"
                   : "bg-emerald-900/30 text-emerald-200"
               }`}
@@ -254,11 +308,16 @@ export default function MyAppointments({ userId }) {
                     ? appt.counselorId
                     : appt.clientId;
                 const isClient = appt.clientId?._id === userId;
+                const isEditing = editingAppointment === appt._id;
 
                 return (
                   <div
                     key={appt._id}
-                    className="bg-gray-800 rounded-xl shadow-sm border border-gray-700 overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-gray-600"
+                    className={`bg-gray-800 rounded-xl shadow-sm border ${
+                      isEditing 
+                        ? "border-indigo-500" 
+                        : "border-gray-700"
+                    } overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-gray-600`}
                   >
                     <div className="p-6">
                       <div className="flex items-start gap-4 mb-4">
@@ -291,16 +350,30 @@ export default function MyAppointments({ userId }) {
                       <div className="space-y-3">
                         <div className="flex items-center text-sm text-gray-300">
                           <CalendarDays className="flex-shrink-0 w-4 h-4 mr-2 text-indigo-400" />
-                          <span>
-                            {new Date(appt.date).toLocaleDateString("en-US", {
-                              weekday: "short",
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
+                          {isEditing ? (
+                            <div className="flex flex-col w-full">
+                              <input
+                                type="datetime-local"
+                                value={newDateTime}
+                                onChange={(e) => setNewDateTime(e.target.value)}
+                                className="bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Select new date and time
+                              </p>
+                            </div>
+                          ) : (
+                            <span>
+                              {new Date(appt.date).toLocaleDateString("en-US", {
+                                weekday: "short",
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          )}
                         </div>
 
                         <div className="flex items-center text-sm text-gray-300">
@@ -332,13 +405,50 @@ export default function MyAppointments({ userId }) {
                     </div>
 
                     {isClient && appt.status?.toLowerCase() === "pending" && (
-                      <div className="bg-gray-700/20 px-6 py-3 border-t border-gray-700 flex justify-end">
-                        <button
-                          onClick={() => handleCancel(appt._id)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors"
-                        >
-                          Cancel Appointment
-                        </button>
+                      <div className="bg-gray-700/20 px-6 py-3 border-t border-gray-700 flex justify-end gap-2">
+                        {isEditing ? (
+                          <>
+                            <button
+                              onClick={cancelRescheduling}
+                              disabled={isLoading}
+                              className="inline-flex items-center px-4 py-2 border border-gray-600 text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors disabled:opacity-50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => saveRescheduling(appt._id)}
+                              disabled={isLoading}
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+                            >
+                              {isLoading ? (
+                                <span className="flex items-center">
+                                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                                  Saving...
+                                </span>
+                              ) : (
+                                <span className="flex items-center">
+                                  <Save className="w-4 h-4 mr-1" />
+                                  Save
+                                </span>
+                              )}
+                            </button>
+                          </>
+                        ) : !appt.isPaid ? (
+                          <button
+                            onClick={() => handleCancel(appt._id)}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors"
+                          >
+                            Cancel Appointment
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => startRescheduling(appt)}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                          >
+                            Reschedule
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>

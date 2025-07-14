@@ -13,8 +13,7 @@ export default function MainLandingPage({ user }) {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Navigation - Improved mobile responsiveness */}
-      <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
+        <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
         <div className="container mx-auto px-4 sm:px-6 py-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
@@ -43,7 +42,7 @@ export default function MainLandingPage({ user }) {
         </div>
       </nav>
 
-      {/* Hero Section - Improved mobile layout */}
+      {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-90"></div>
         <div className="container mx-auto px-4 sm:px-6 py-16 md:py-24 relative z-10">
@@ -120,17 +119,15 @@ export default function MainLandingPage({ user }) {
         </div>
       </section>
 
-      {/* Stats Section - Animated counters */}
+      {/* Stats Section */}
       <section className="py-16 bg-gray-800">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="text-4xl font-bold text-indigo-400 mb-2">
                 10,000+
               </div>
-              <p className="text-gray-300 font-medium">
-                Sessions Completed
-              </p>
+              <p className="text-gray-300 font-medium">Sessions Completed</p>
             </div>
             <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="text-4xl font-bold text-indigo-400 mb-2">
@@ -144,23 +141,17 @@ export default function MainLandingPage({ user }) {
               <div className="text-4xl font-bold text-indigo-400 mb-2">
                 24/7
               </div>
-              <p className="text-gray-300 font-medium">
-                Support Available
-              </p>
+              <p className="text-gray-300 font-medium">Support Available</p>
             </div>
             <div className="text-center p-6 bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-4xl font-bold text-indigo-400 mb-2">
-                95%
-              </div>
-              <p className="text-gray-300 font-medium">
-                Client Satisfaction
-              </p>
+              <div className="text-4xl font-bold text-indigo-400 mb-2">95%</div>
+              <p className="text-gray-300 font-medium">Client Satisfaction</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section - Card grid with icons */}
+      {/* Features Section */}
       <section className="py-20 container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -303,15 +294,13 @@ export default function MainLandingPage({ user }) {
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-gray-400">
-                {feature.description}
-              </p>
+              <p className="text-gray-400">{feature.description}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* How It Works - Timeline style */}
+      {/* How It Works */}
       <section className="py-20 bg-gray-800">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -328,7 +317,7 @@ export default function MainLandingPage({ user }) {
 
           <div className="max-w-4xl mx-auto">
             <div className="relative">
-              {/* Timeline line */}
+              
               <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-700 transform -translate-x-1/2"></div>
 
               {/* Steps */}
@@ -336,8 +325,7 @@ export default function MainLandingPage({ user }) {
                 {
                   number: "1",
                   title: "Create Your Profile",
-                  description:
-                    "Register with your name, email, and password",
+                  description: "Register with your name, email, and password",
                 },
                 {
                   number: "2",
@@ -365,9 +353,7 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-400">
-                            {step.description}
-                          </p>
+                          <p className="text-gray-400">{step.description}</p>
                         </div>
                         <div className="flex justify-center md:justify-start md:w-1/2">
                           <div className="w-20 h-20 rounded-full bg-indigo-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg">
@@ -378,9 +364,7 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-400">
-                            {step.description}
-                          </p>
+                          <p className="text-gray-400">{step.description}</p>
                         </div>
                       </>
                     ) : (
@@ -394,17 +378,13 @@ export default function MainLandingPage({ user }) {
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-400">
-                            {step.description}
-                          </p>
+                          <p className="text-gray-400">{step.description}</p>
                         </div>
                         <div className="md:hidden mt-4 text-center">
                           <h3 className="text-xl font-semibold mb-2">
                             {step.title}
                           </h3>
-                          <p className="text-gray-400">
-                            {step.description}
-                          </p>
+                          <p className="text-gray-400">{step.description}</p>
                         </div>
                       </>
                     )}
@@ -416,7 +396,7 @@ export default function MainLandingPage({ user }) {
         </div>
       </section>
 
-      {/* Testimonials - Carousel style */}
+      {/* Testimonials */}
       <section className="py-20 container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -471,20 +451,16 @@ export default function MainLandingPage({ user }) {
                 </div>
                 <div>
                   <h4 className="font-semibold">{testimonial.name}</h4>
-                  <p className="text-sm text-gray-400">
-                    {testimonial.role}
-                  </p>
+                  <p className="text-sm text-gray-400">{testimonial.role}</p>
                 </div>
               </div>
-              <p className="text-gray-300 italic">
-                "{testimonial.quote}"
-              </p>
+              <p className="text-gray-300 italic">"{testimonial.quote}"</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* FAQ Section - Accordion style */}
+      {/* FAQ Section */}
       <section className="py-20 bg-gray-800">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -564,9 +540,7 @@ export default function MainLandingPage({ user }) {
                       : "max-h-0 opacity-0"
                   }`}
                 >
-                  <p className="text-gray-400">
-                    {item.answer}
-                  </p>
+                  <p className="text-gray-400">{item.answer}</p>
                 </div>
               </div>
             ))}
@@ -574,7 +548,7 @@ export default function MainLandingPage({ user }) {
         </div>
       </section>
 
-      {/* Final CTA - Gradient background */}
+      {/* Final CTA */}
       <section className="relative py-20 bg-gradient-to-r from-indigo-600 to-purple-600 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-5 pattern-dots pattern-gray-400 pattern-bg-transparent pattern-size-6 pattern-opacity-100"></div>
         <div className="container mx-auto px-6 relative z-10">
@@ -603,19 +577,23 @@ export default function MainLandingPage({ user }) {
         </div>
       </section>
 
-      {/* Footer - Multi-column with all links */}
+      {/* Footer */}
       <footer className="py-16 bg-gray-900 text-gray-400">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-            {/* Brand column */}
-            <div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+            {/* Brand Column */}
+            <div className="sm:col-span-2 md:col-span-1">
+              {" "}
+             
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">
                   W
                 </div>
                 <span className="text-2xl font-bold text-white">WellMind</span>
               </div>
-              <p className="text-gray-400">
+              
+              <p className="text-gray-400 text-sm sm:text-base">
                 Professional online counseling platform for mental health and
                 wellness.
               </p>

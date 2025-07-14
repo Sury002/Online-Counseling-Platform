@@ -28,13 +28,13 @@ export default function Login() {
 
      login(user, token);
 
-      // Redirect based on user role
+    
       navigate(user.role === "counselor" ? "/dashboard/counselor" : "/dashboard/client");
     } catch (err) {
       const errMsg = err.response?.data?.msg || "Login failed. Please check your credentials and try again.";
       setError(errMsg);
 
-      // Show resend verification link if account isn't verified
+     
       if (errMsg.toLowerCase().includes("not verified")) {
         setShowResend(true);
       }

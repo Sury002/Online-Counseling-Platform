@@ -19,6 +19,7 @@ import {
   LogOut,
   Menu,
   ChevronLeft,
+  X,
 } from "lucide-react";
 
 export default function ChatInterface() {
@@ -105,7 +106,13 @@ export default function ChatInterface() {
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim() || !selected?.isPaid || selected.status === "completed")
+   
+    if (
+      !text.trim() ||
+      !selected?.isPaid ||
+      selected.status === "completed" ||
+      selected.status === "cancelled"
+    )
       return;
 
     const msg = {
@@ -282,17 +289,28 @@ export default function ChatInterface() {
                         Completed
                       </span>
                     )}
-                    {!appt.isPaid ? (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-400 flex items-center gap-1">
+                    {appt.status === "cancelled" && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-300 flex items-center gap-1">
+                        <X className="w-3 h-3" />
+                        Cancelled
+                      </span>
+                    )}
+
+                    {appt.status !== "cancelled" && !appt.isPaid && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/30 text-amber-300 flex items-center gap-1">
                         <Lock className="w-3 h-3" />
                         Unpaid
                       </span>
-                    ) : (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-900/30 text-green-300 flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        Paid
-                      </span>
                     )}
+
+                    {appt.status !== "cancelled" &&
+                      appt.status !== "completed" &&
+                      appt.isPaid && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-900/30 text-green-300 flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          Paid
+                        </span>
+                      )}
                   </div>
                 </div>
               </div>
@@ -347,7 +365,8 @@ export default function ChatInterface() {
                   </div>
                 </div>
               </div>
-              {!selected.isPaid ? (
+              
+              {!selected.isPaid && selected.status !== "cancelled" ? (
                 <button
                   onClick={startPayment}
                   className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -387,9 +406,7 @@ export default function ChatInterface() {
                         <div className="text-sm">{msg.message}</div>
                         <div
                           className={`flex items-center justify-end gap-1 mt-1 text-xs ${
-                            isSender
-                              ? "text-indigo-200"
-                              : "text-gray-400"
+                            isSender ? "text-indigo-200" : "text-gray-400"
                           }`}
                         >
                           {formatTimestamp(msg.createdAt || msg.timestamp)}
@@ -420,7 +437,10 @@ export default function ChatInterface() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-gray-700 bg-gray-800">
-              {selected.isPaid && selected.status !== "completed" ? (
+    
+              {selected.isPaid &&
+              selected.status !== "completed" &&
+              selected.status !== "cancelled" ? (
                 <form onSubmit={sendMessage} className="flex gap-2">
                   <input
                     type="text"
@@ -445,14 +465,17 @@ export default function ChatInterface() {
                 <div className="space-y-3">
                   <div
                     className={`p-3 rounded-lg flex items-center gap-2 text-sm ${
-                      selected.status === "completed"
-                        ? "bg-emerald-900/20 text-emerald-300"
+                      selected.status === "completed" ||
+                      selected.status === "cancelled"
+                        ? "bg-rose-900/20 text-rose-300"
                         : "bg-amber-900/20 text-amber-300"
                     }`}
                   >
                     <Lock className="w-4 h-4" />
                     {selected.status === "completed"
-                      ? "Chat disabled — session marked as completed"
+                      ? "Chat disabled — session completed"
+                      : selected.status === "cancelled"
+                      ? "Chat disabled — session cancelled"
                       : "Please complete payment to unlock chat"}
                   </div>
                   <textarea

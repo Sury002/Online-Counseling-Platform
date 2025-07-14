@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function PaymentCancel() {
-  // Force dark mode on mount
+
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900');

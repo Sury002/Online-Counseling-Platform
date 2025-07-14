@@ -18,7 +18,7 @@ export default function VerifyEmail() {
       return;
     }
 
-    // Simple token format validation before API call
+   
     if (!/^[a-f0-9]{64}$/.test(token)) {
       setError("Invalid verification link format");
       setIsLoading(false);

@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 const { createLogger, format, transports } = require("winston");
 
-// Configure logger for email operations
+
 const logger = createLogger({
   level: "info",
   format: format.combine(
@@ -15,19 +15,19 @@ const logger = createLogger({
   ]
 });
 
-// Create reusable transporter object
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  pool: true, // Use connection pooling
-  maxConnections: 5, // Maximum number of connections
-  maxMessages: 100, // Max messages per connection
+  pool: true, 
+  maxConnections: 5, 
+  maxMessages: 100, 
 });
 
-// Verify connection on startup
+
 transporter.verify((error) => {
   if (error) {
     logger.error("❌ Email server connection error:", error);
@@ -42,7 +42,6 @@ const sendEmail = async ({ to, subject, html, text = null }) => {
       throw new Error("Missing required email parameters");
     }
 
-    // Validate email format
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
       throw new Error(`Invalid email address: ${to}`);
     }
@@ -52,7 +51,7 @@ const sendEmail = async ({ to, subject, html, text = null }) => {
       to,
       subject: subject.trim(),
       html,
-      text: text || html.replace(/<[^>]*>?/gm, ''), // Fallback text version
+      text: text || html.replace(/<[^>]*>?/gm, ''), 
       priority: 'high',
       headers: {
         'X-Priority': '1',

@@ -155,7 +155,7 @@ router.post("/reset-password", async (req, res) => {
 
     if (!user) return res.status(400).json({ msg: "Invalid or expired token" });
 
-    // Set the new password (let pre-save hook handle hashing)
+
     user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;

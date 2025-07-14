@@ -3,7 +3,7 @@ import { CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function PaymentSuccess() {
-  // Force dark mode on mount to match PaymentCancel
+ 
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900');

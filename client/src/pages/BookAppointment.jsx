@@ -11,11 +11,12 @@ export default function BookAppointment() {
     counselorId: "",
     sessionType: "Mental Health",
     date: "",
+    time: ""
   });
-  const [notification, setNotification] = useState(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isBooked, setIsBooked] = useState(false); 
 
   useEffect(() => {
     const rawUser = localStorage.getItem("user");
@@ -37,11 +38,6 @@ export default function BookAppointment() {
       .catch(() => setError("Failed to load counselors"));
   }, []);
 
-  const showNotification = (message, isSuccess) => {
-    setNotification({ message, isSuccess });
-    setTimeout(() => setNotification(null), 5000);
-  };
-
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -49,7 +45,15 @@ export default function BookAppointment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const payload = { ...form, clientId: userId };
+    setError("");
+    
+
+    const dateTime = form.date && form.time ? `${form.date}T${form.time}` : "";
+    const payload = { 
+      ...form, 
+      clientId: userId,
+      date: dateTime
+    };
 
     if (
       !payload.clientId ||
@@ -57,27 +61,36 @@ export default function BookAppointment() {
       !payload.sessionType ||
       !payload.date
     ) {
-      showNotification("Please fill in all fields", false);
+      setError("Please fill in all fields");
       setIsSubmitting(false);
       return;
     }
 
     try {
       await API.post("/appointments/book", payload);
-      showNotification("Appointment booked successfully!", true);
+      setIsBooked(true);
       setForm({
         counselorId: "",
         sessionType: "Mental Health",
         date: "",
+        time: ""
       });
-    } catch {
-      showNotification("Error booking appointment", false);
+      
+      
+      setTimeout(() => {
+        setIsBooked(false);
+      }, 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Error booking appointment");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const today = new Date().toISOString().slice(0, 16);
+  const today = new Date().toISOString().split('T')[0];
+  
+  const now = new Date();
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
@@ -148,68 +161,8 @@ export default function BookAppointment() {
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4 py-12 md:py-0">
-        {/* Notification Toast */}
-        {notification && (
-          <div
-            className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
-              notification ? "animate-fade-in" : "animate-fade-out"
-            }`}
-          >
-            <div
-              className={`px-6 py-4 rounded-lg shadow-xl flex items-center space-x-3 ${
-                notification.isSuccess
-                  ? "bg-green-900/30 border border-green-700"
-                  : "bg-red-900/30 border border-red-700"
-              }`}
-            >
-              <div
-                className={`flex-shrink-0 h-6 w-6 ${
-                  notification.isSuccess ? "text-green-400" : "text-red-400"
-                }`}
-              >
-                {notification.isSuccess ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
-              </div>
-              <p
-                className={`text-sm font-medium ${
-                  notification.isSuccess ? "text-green-300" : "text-red-300"
-                }`}
-              >
-                {notification.message}
-              </p>
-            </div>
-          </div>
-        )}
-
         <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
-          {/* Hero Image - Hidden on mobile */}
+          {/* Hero Image */}
           <div className="hidden md:block relative">
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             <img
@@ -333,36 +286,74 @@ export default function BookAppointment() {
                 </div>
               </div>
 
-              {/* DateTime Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1 md:mb-2">
-                  Select Date & Time
-                </label>
-                <input
-                  type="datetime-local"
-                  name="date"
-                  value={form.date}
-                  onChange={handleChange}
-                  min={today}
-                  className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
-                  required
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Date Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1 md:mb-2">
+                    Select Date
+                  </label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={form.date}
+                    onChange={handleChange}
+                    min={today}
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
+                    required
+                  />
+                </div>
+                
+                {/* Time Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1 md:mb-2">
+                    Select Time
+                  </label>
+                  <input
+                    type="time"
+                    name="time"
+                    value={form.time}
+                    onChange={handleChange}
+                    min={form.date === today ? currentTime : undefined}
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
+                    required
+                  />
+                </div>
               </div>
 
-              {/* Submit */}
+              {/* Submit Button with Confirmation State */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className={`w-full py-2 md:py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium rounded-lg shadow-md transition-all duration-300 text-sm md:text-base ${
-                  isSubmitting
-                    ? "opacity-70"
-                    : "hover:from-blue-700 hover:to-blue-600"
+                disabled={isSubmitting || isBooked}
+                className={`w-full py-3 px-4 font-medium rounded-lg shadow-md transition-all duration-300 text-base ${
+                  isBooked
+                    ? "bg-green-600 text-white cursor-default"
+                    : isSubmitting
+                    ? "bg-blue-700 opacity-70"
+                    : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600"
                 }`}
               >
-                {isSubmitting ? (
+                {isBooked ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg
-                      className="animate-spin h-4 w-4 md:h-5 md:w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Booked Successfully!
+                  </span>
+                ) : isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

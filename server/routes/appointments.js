@@ -110,6 +110,49 @@ router.patch("/:id/cancel", async (req, res) => {
   }
 });
 
+// Reschedule appointment
+router.patch("/:id/reschedule", async (req, res) => {
+  const { id } = req.params;
+  const { date } = req.body;
+
+  if (!date) {
+    return res.status(400).json({ message: "New date is required" });
+  }
+
+  try {
+      const appointment = await Appointment.findById(id);
+    
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (appointment.status !== "pending") {
+      return res.status(400).json({ 
+        message: "Only pending appointments can be rescheduled" 
+      });
+    }
+
+    const newDate = new Date(date);
+    if (newDate <= new Date()) {
+      return res.status(400).json({ 
+        message: "New date must be in the future" 
+      });
+    }
+
+   
+    appointment.date = newDate;
+    const updatedAppointment = await appointment.save();
+
+    res.json(updatedAppointment);
+  } catch (err) {
+    console.error("❌ Reschedule Error:", err);
+    res.status(500).json({ 
+      message: "Error rescheduling appointment",
+      error: err.message 
+    });
+  }
+});
+
 // Manually mark appointment as paid
 router.patch("/:id/pay", async (req, res) => {
   try {
@@ -148,4 +191,3 @@ router.patch("/mark-completed/:id", async (req, res) => {
 });
 
 module.exports = router;
-

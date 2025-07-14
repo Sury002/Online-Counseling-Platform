@@ -23,7 +23,7 @@ export default function PayForSession() {
   const [error, setError] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
 
-  // Force dark mode on mount
+
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900');

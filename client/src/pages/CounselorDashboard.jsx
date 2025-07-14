@@ -45,7 +45,15 @@ export default function CounselorDashboard({ userId }) {
     if (userId) fetchStats();
   }, [userId]);
 
-  const upcoming = appointments.filter((a) => new Date(a.date) > new Date());
+  const upcoming = appointments.filter((a) => {
+    if (!a.status) return false; 
+    const normalizedStatus = a.status.trim().toLowerCase();
+    return (
+      new Date(a.date) > new Date() &&
+      normalizedStatus !== "cancelled" &&
+      normalizedStatus !== "completed"
+    );
+  });
 
   return (
     <div className="min-h-screen flex bg-gray-900">

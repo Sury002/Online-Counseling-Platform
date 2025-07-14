@@ -16,6 +16,7 @@ import {
   Menu,
   ChevronLeft,
   Shield,
+  X, 
 } from "lucide-react";
 
 export default function CounselorNoteEditor() {
@@ -60,6 +61,12 @@ export default function CounselorNoteEditor() {
     const appt = appointments.find((a) => a._id === appointmentId);
     setSelectedAppointment(appt || null);
 
+  
+    if (appt?.status === "cancelled") {
+      setNote("");
+      return;
+    }
+
     setLoading(true);
     API.get(`/notes/counselor/${appointmentId}/${counselorId}`)
       .then((res) => {
@@ -91,7 +98,9 @@ export default function CounselorNoteEditor() {
     }
   };
 
-  const isReadOnly = selectedAppointment?.status === "completed";
+  const isReadOnly =
+    selectedAppointment?.status === "completed" ||
+    selectedAppointment?.status === "cancelled";
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-900 text-gray-100">
@@ -231,17 +240,25 @@ export default function CounselorNoteEditor() {
                         Completed
                       </span>
                     )}
-                    {!appt.isPaid ? (
-                      <span className="text-xs px-2 py-1 rounded-full bg-rose-900/20 text-rose-400 flex items-center gap-1">
-                        <XCircle className="w-3 h-3" />
+                    {appt.status === "cancelled" && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-rose-900/30 text-rose-300 flex items-center gap-1">
+                        <X className="w-3 h-3" />
+                        Cancelled
+                      </span>
+                    )}
+                    {appt.status !== "cancelled" && !appt.isPaid ? (
+                      <span className="text-xs px-2 py-1 rounded-full bg-amber-900/30 text-amber-300 flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
                         Unpaid
                       </span>
-                    ) : (
+                    ) : appt.isPaid &&
+                      appt.status !== "completed" &&
+                      appt.status !== "cancelled" ? (
                       <span className="text-xs px-2 py-1 rounded-full bg-emerald-900/20 text-emerald-400 flex items-center gap-1">
                         <CheckCircle className="w-3 h-3" />
                         Paid
                       </span>
-                    )}
+                    ) : null}
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   </div>
                 </div>
@@ -277,18 +294,31 @@ export default function CounselorNoteEditor() {
                 Choose a client session from the sidebar to view or edit notes
               </p>
             </div>
-          ) : loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
-            </div>
-          ) : !selectedAppointment.isPaid ? (
+          ) : selectedAppointment.status === "cancelled" ||
+            !selectedAppointment.isPaid ? (
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-              <div className="flex items-center gap-3 bg-amber-900/20 text-amber-300 p-4 rounded-lg mb-4">
-                <Lock className="w-5 h-5" />
+              <div
+                className={`flex items-center gap-3 p-4 rounded-lg mb-4 ${
+                  selectedAppointment.status === "cancelled"
+                    ? "bg-rose-900/20 text-rose-300"
+                    : "bg-amber-900/20 text-amber-300"
+                }`}
+              >
+                {selectedAppointment.status === "cancelled" ? (
+                  <XCircle className="w-5 h-5" />
+                ) : (
+                  <Lock className="w-5 h-5" />
+                )}
                 <div>
-                  <h3 className="font-medium">Session Locked</h3>
+                  <h3 className="font-medium">
+                    {selectedAppointment.status === "cancelled"
+                      ? "Session Cancelled"
+                      : "Session Locked"}
+                  </h3>
                   <p className="text-sm">
-                    Client must complete payment before notes can be added
+                    {selectedAppointment.status === "cancelled"
+                      ? "Notes are not available for cancelled sessions"
+                      : "Client must complete payment before notes can be added"}
                   </p>
                 </div>
               </div>
@@ -309,7 +339,26 @@ export default function CounselorNoteEditor() {
                     }
                   )}
                 </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selectedAppointment.status === "cancelled" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-rose-900/30 text-rose-300 flex items-center gap-1">
+                      <X className="w-3 h-3" />
+                      Cancelled
+                    </span>
+                  )}
+                  {!selectedAppointment.isPaid &&
+                    selectedAppointment.status !== "cancelled" && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-900/30 text-amber-300 flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        Unpaid
+                      </span>
+                    )}
+                </div>
               </div>
+            </div>
+          ) : loading ? (
+            <div className="flex justify-center items-center h-64">
+              <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
             </div>
           ) : (
             <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
@@ -331,6 +380,12 @@ export default function CounselorNoteEditor() {
                       }
                     )}
                   </p>
+                  {selectedAppointment.status === "completed" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-900/30 text-emerald-300 inline-flex items-center gap-1 mt-2">
+                      <CheckCircle className="w-3 h-3" />
+                      Session completed
+                    </span>
+                  )}
                 </div>
                 <textarea
                   value={note}
@@ -361,7 +416,9 @@ export default function CounselorNoteEditor() {
                     <Save className="w-4 h-4" />
                   )}
                   {isReadOnly
-                    ? "Notes are read-only (completed)"
+                    ? selectedAppointment.status === "completed"
+                      ? "Notes are read-only (completed)"
+                      : "Notes are read-only (cancelled)"
                     : "Save Notes"}
                 </button>
               </div>

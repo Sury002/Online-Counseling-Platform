@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { API } from "../api";
 import AgoraRTC from "agora-rtc-sdk-ng";
@@ -54,6 +54,7 @@ export default function VideoCall() {
   const timerRef = useRef(null);
   const remoteUserRef = useRef(null);
   const statsIntervalRef = useRef(null);
+  const [bothConnected, setBothConnected] = useState(false);
 
   const APP_ID = import.meta.env.VITE_AGORA_APP_ID;
   const [token, setToken] = useState(null);
@@ -69,7 +70,7 @@ export default function VideoCall() {
     left: false,
   });
 
-  // Force dark mode on mount
+ 
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900');
@@ -86,6 +87,22 @@ export default function VideoCall() {
     return `${mins.toString().padStart(2, "0")}:${secs
       .toString()
       .padStart(2, "0")}`;
+  };
+
+  // Timer control functions
+  const startTimer = () => {
+    stopTimer();
+    setCallDuration(0);
+    timerRef.current = setInterval(() => {
+      setCallDuration((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
   // Check media permissions
@@ -120,7 +137,7 @@ export default function VideoCall() {
         speakers
       });
       
-      // Set default devices if available
+      
       if (microphones.length > 0) {
         setSelectedDevices(prev => ({
           ...prev,
@@ -155,9 +172,6 @@ export default function VideoCall() {
         if (isMounted) {
           setAppointment(res.data);
           setCallStatus("waiting");
-          timerRef.current = setInterval(() => {
-            setCallDuration((prev) => prev + 1);
-          }, 1000);
         }
       })
       .catch((err) => {
@@ -167,17 +181,24 @@ export default function VideoCall() {
 
     return () => {
       isMounted = false;
-      if (timerRef.current) clearInterval(timerRef.current);
+      stopTimer();
     };
   }, [appointmentId, navigate]);
 
-  // Check permissions and get devices on mount
+
+  useEffect(() => {
+    return () => {
+      stopTimer();
+    };
+  }, []);
+
+
   useEffect(() => {
     checkPermissions();
     getDevices();
   }, []);
 
-  // Join Agora when appointment is ready
+
   useEffect(() => {
     if (!appointment || !user) return;
 
@@ -185,7 +206,7 @@ export default function VideoCall() {
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     rtcClientRef.current = client;
 
-    // Simulate connection quality
+    
     const qualityInterval = setInterval(() => {
       const qualities = ["good", "average", "poor"];
       setConnectionQuality(
@@ -226,7 +247,7 @@ export default function VideoCall() {
         await client.join(APP_ID, appointmentId, generatedToken, uid);
         setCallStatus("connected");
 
-        // Start monitoring network stats
+
         statsIntervalRef.current = setInterval(monitorNetworkStats, 5000);
 
         client.on("user-joined", (remoteUser) => {
@@ -237,6 +258,12 @@ export default function VideoCall() {
             uid: remoteUser.uid,
             left: false,
           }));
+          
+     
+          if (!bothConnected) {
+            setBothConnected(true);
+            startTimer();
+          }
         });
 
         client.on("user-published", async (remoteUser, mediaType) => {
@@ -285,6 +312,10 @@ export default function VideoCall() {
             left: true,
             uid: remoteUser.uid,
           }));
+          
+          
+          setBothConnected(false);
+          stopTimer();
         });
 
         // Publish media tracks for both counselor and client
@@ -399,7 +430,7 @@ export default function VideoCall() {
       [type]: deviceId
     }));
 
-    // Recreate track if it exists
+   
     if (type === 'microphone' && localAudioTrackRef.current) {
       try {
         await localAudioTrackRef.current.close();
@@ -436,7 +467,7 @@ export default function VideoCall() {
       if (rtcClientRef.current) {
         await rtcClientRef.current.leave();
       }
-      // Update appointment status to completed
+      
       await API.patch(`/appointments/${appointmentId}/complete`);
     } catch (err) {
       console.error("Error completing appointment:", err);
@@ -482,6 +513,9 @@ export default function VideoCall() {
           <p className="text-gray-400 mt-2 max-w-md">
             The other participant has ended the call. You can safely leave now.
           </p>
+          <p className="text-gray-400 mt-2 font-medium">
+            Call lasted: {formatTime(callDuration)}
+          </p>
         </div>
       );
     }
@@ -504,6 +538,11 @@ export default function VideoCall() {
             {otherParticipant.name} hasn't joined yet. The call will start
             automatically when they arrive.
           </p>
+          {callDuration > 0 && (
+            <p className="text-gray-400 mt-2">
+              Previous call duration: {formatTime(callDuration)}
+            </p>
+          )}
         </div>
       );
     }
@@ -602,7 +641,7 @@ export default function VideoCall() {
           </div>
         </div>
 
-        {/* Collapsible header info for mobile */}
+       
         {(showHeaderInfo || window.innerWidth >= 768) && (
           <div className="flex items-center space-x-4 text-sm text-gray-300 mt-2">
             <div className="flex items-center">
@@ -681,7 +720,7 @@ export default function VideoCall() {
 
       {/* Video Grid */}
       <div className="flex-1 relative">
-        {/* Remote video (primary) */}
+       
         <div
           ref={remoteVideoRef}
           className={`absolute inset-0 bg-gray-800 transition-opacity duration-300 ${

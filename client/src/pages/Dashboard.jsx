@@ -10,7 +10,6 @@ import {
   User,
   LogOut,
   FileText,
-  BrainCircuit,
   HeartPulse,
   Smile,
   Users,
@@ -48,7 +47,16 @@ export default function Dashboard() {
     fetchAppointments();
   }, [user._id]);
 
-  const upcoming = appointments.filter((a) => new Date(a.date) > new Date());
+   const upcoming = appointments.filter((a) => {
+    if (!a.status) return false; 
+    const normalizedStatus = a.status.trim().toLowerCase();
+    return (
+      new Date(a.date) > new Date() &&
+      normalizedStatus !== "cancelled" &&
+      normalizedStatus !== "completed"
+    );
+  });
+  
   const paid = appointments.filter((a) => a.isPaid);
 
   const wellnessDimensions = [

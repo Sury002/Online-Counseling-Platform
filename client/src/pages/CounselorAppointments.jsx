@@ -10,12 +10,15 @@ import {
   CheckCircle,
   User,
   Menu,
+  Filter,
+  ChevronDown
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CounselorAppointments({ userId }) {
   const [appointments, setAppointments] = useState([]);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("All"); 
 
   useEffect(() => {
     if (!userId) return;
@@ -23,6 +26,14 @@ export default function CounselorAppointments({ userId }) {
       .then((res) => setAppointments(res.data))
       .catch(() => console.error("Error loading appointments"));
   }, [userId]);
+
+
+  const filteredAppointments =
+    filterStatus === "All"
+      ? appointments
+      : appointments.filter(
+          (appt) => appt.status?.toLowerCase() === filterStatus.toLowerCase()
+        );
 
   const getStatusStyles = (status) => {
     switch (status?.toLowerCase()) {
@@ -113,22 +124,55 @@ export default function CounselorAppointments({ userId }) {
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-8 overflow-auto">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-              My Appointments
-            </h2>
-            <p className="text-gray-400">
-              Manage your upcoming and past counseling sessions
-            </p>
+  
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                My Appointments
+              </h2>
+              <p className="text-gray-400">
+                Manage your upcoming and past counseling sessions
+              </p>
+            </div>
+            
+            {/* Filter dropdown */}
+            <div className="relative w-full sm:w-64">
+              <div className="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 shadow-sm hover:border-indigo-500 transition-colors focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent">
+                <Filter className="w-4 h-4 text-indigo-400" />
+                <select
+                  className="appearance-none bg-gray-800 pr-8 py-1 text-sm focus:outline-none text-white w-full cursor-pointer"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                  <option value="All" className="bg-gray-800 text-white">
+                    All Appointments
+                  </option>
+                  <option value="Pending" className="bg-gray-800 text-white">
+                    Pending
+                  </option>
+                  <option value="Completed" className="bg-gray-800 text-white">
+                    Completed
+                  </option>
+                  <option value="Cancelled" className="bg-gray-800 text-white">
+                    Cancelled
+                  </option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 pointer-events-none" />
+              </div>
+            </div>
           </div>
 
-          {appointments.length === 0 ? (
+          {filteredAppointments.length === 0 ? (
             <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-8 text-center">
-              <p className="text-gray-400 text-lg">No appointments scheduled</p>
+              <p className="text-gray-400 text-lg">
+                {filterStatus === "All"
+                  ? "No appointments scheduled"
+                  : `No ${filterStatus.toLowerCase()} appointments`}
+              </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
-              {appointments.map((app) => {
+              {filteredAppointments.map((app) => {
                 const interactionAllowed = isInteractionAllowed(app);
                 return (
                   <div
@@ -180,9 +224,9 @@ export default function CounselorAppointments({ userId }) {
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
+                 
                     <div className="flex flex-wrap gap-2 mt-4">
-                      {/* Chat Button */}
+                  
                       <Link
                         to={
                           interactionAllowed
