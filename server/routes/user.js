@@ -18,7 +18,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Update profile (name, email)
+// Update profile 
 router.put("/:id", async (req, res) => {
   try {
     const { name } = req.body;
