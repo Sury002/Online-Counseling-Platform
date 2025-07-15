@@ -38,7 +38,7 @@ A secure, full-stack **MERN** application for online therapy and counseling serv
   - ZIP: Any 5-digit number (e.g., `12345`)
 
 ### 📅 Appointments
-- Clients can book sessions with available counselors
+- Clients can book appointments, reschedule paid appointments and cancel unpaid appointments.
 - Counselors can manage and complete appointments 
 
 ### 📝 Session Notes
